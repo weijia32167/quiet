@@ -115,8 +115,6 @@
                 <version>2.5.3</version>
                 <configuration>
                     <tagBase>https://github.com/weijia32167/quiet/tags</tagBase>
-                    <username>weijia32167</username>
-                    <password>6070790aj</password>
                 </configuration>
             </plugin>
         </plugins>
