@@ -5,9 +5,9 @@
 
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.quiet</groupId>
-    <artifactId>parent</artifactId>
+    <artifactId>base</artifactId>
     <version>1.0-SNAPSHOT</version>
-    <packaging>pom</packaging>
+    <packaging>jar</packaging>
 
     <scm>
         <developerConnection>scm:git:https://github.com/weijia32167/quiet</developerConnection>
