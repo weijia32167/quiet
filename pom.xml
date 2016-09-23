@@ -102,11 +102,11 @@
                 <version>1.9.5</version>
                 <configuration>
                     <connectionType>developerConnection</connectionType>
-                    <includes>
+                   <!-- <includes>
                         pom.xml,src
                     </includes>
                     <username>weijia32167</username>
-                    <password>6070790aj</password>
+                    <password>6070790aj</password>-->
                 </configuration>
             </plugin>
 
