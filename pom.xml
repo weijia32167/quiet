@@ -23,7 +23,7 @@
                 <configuration>
                     <connectionType>developerConnection</connectionType>
                     <includes>
-                        pom.xml
+                        pom.xml,src/*.*
                     </includes>
                     <username>weijia32167</username>
                     <password>6070790aj</password>
