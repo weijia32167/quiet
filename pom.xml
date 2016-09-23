@@ -25,6 +25,8 @@
                     <includes>
                         pom.xml
                     </includes>
+                    <username>weijia32167</username>
+                    <password>6070790aj</password>
                 </configuration>
             </plugin>
         </plugins>
