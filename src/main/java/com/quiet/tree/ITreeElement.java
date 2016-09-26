@@ -1,6 +1,6 @@
 package com.quiet.tree;
 
-import java.util.List;
+import java.util.PriorityQueue;
 
 /**
  * Copyright tv.sohu.com
@@ -16,11 +16,16 @@ public interface ITreeElement<T> {
 
     public T outputData();
 
+    public ITreeElement<T> getRoot();
+
     public ITreeElement<T> getParent();
 
-    public List<ITreeElement<T>> getChildren();
+    public PriorityQueue<ITreeElement<T>> getChildren();
 
     public ITreeElement<T> element(ITreeElement<T> children);
 
+    public int getPriority();
+
+    public void setParent(ITreeElement<T> parent);
 
 }
