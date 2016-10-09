@@ -23,10 +23,6 @@ public class TreeElement<T> implements ITreeElement<T>,Comparable<ITreeElement<T
         this.data = data;
     }
 
-    public TreeElement(T data,int priority) {
-        this.priority = priority;
-        this.data = data;
-    }
     /*树元素不包含额外数据*/
     public TreeElement() {}
 
@@ -77,16 +73,6 @@ public class TreeElement<T> implements ITreeElement<T>,Comparable<ITreeElement<T
     }
 
     @Override
-    public ITreeElement<T> element(ITreeElement<T> children) {
-        children.setParent(this);
-        if(childrens == null){
-            childrens = new PriorityQueue<>();
-        }
-        childrens.offer(children);
-        return this;
-    }
-
-    @Override
     public ElementType getType() {
         ElementType result = null;
         if(this.getParent() == null && this.getChildren() == null){
@@ -117,6 +103,28 @@ public class TreeElement<T> implements ITreeElement<T>,Comparable<ITreeElement<T
     @Override
     public int getPriority() {
         return priority;
+    }
+
+    @Override
+    public void setPriority() {
+        ITreeElement parent = getParent();
+        if(parent.getChildren() == null){
+            priority = 1;
+        }else{
+            int size = parent.getChildren().size();
+            priority = size+1;
+        }
+    }
+
+    @Override
+    public ITreeElement<T> element(ITreeElement<T> children) {
+        children.setParent(this);
+        children.setPriority();
+        if(childrens == null){
+            childrens = new PriorityQueue<>();
+        }
+        childrens.offer(children);
+        return this;
     }
 
     @Override

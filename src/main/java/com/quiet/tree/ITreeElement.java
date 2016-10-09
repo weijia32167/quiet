@@ -22,9 +22,12 @@ public interface ITreeElement<T> {
 
     public PriorityQueue<ITreeElement<T>> getChildren();
 
+    /*初始化顺序会决定优先级*/
     public ITreeElement<T> element(ITreeElement<T> children);
 
     public int getPriority();
+
+    public void setPriority();
 
     public void setParent(ITreeElement<T> parent);
 
