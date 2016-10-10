@@ -1,5 +1,6 @@
 package com.quiet.tree;
 
+import java.util.List;
 import java.util.PriorityQueue;
 
 /**
@@ -14,7 +15,7 @@ public interface ITreeElement<T extends IData> {
 
     public int getDepth();
 
-    public ITreeElement getRoot();
+    public TreeRootElement getRoot();
 
     public ITreeElement getParent();
 
@@ -28,5 +29,10 @@ public interface ITreeElement<T extends IData> {
     public double getRatio();
 
     public T outputData();
+
+    public String getUniqueName();
+    /**当前节点到根节点的路径中所有经过的节点*/
+    public List<ITreeElement> getChain();
+
 
 }

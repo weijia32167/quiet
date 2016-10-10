@@ -2,6 +2,8 @@ package com.quiet.tree;
 
 import com.quiet.math.Arith;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.PriorityQueue;
 
 /**
@@ -16,16 +18,20 @@ public class TreeNodeElement<T extends IData> implements ITreeElement,Comparable
 
     private PriorityQueue<ITreeElement> childrens;
 
-    private int priority = -1;
+    private int priority = 0;
 
     private double ratio;
 
+    private String name;
+
     protected T data;
 
-    public TreeNodeElement(double ratio) {
+    public TreeNodeElement(double ratio,String name) {
         this.ratio = ratio;
+        this.name = name;
     }
 
+    /*********************************Implements ITreeElement*****************************************/
     @Override
     public int getDepth() {
         int depth = 0;
@@ -56,15 +62,15 @@ public class TreeNodeElement<T extends IData> implements ITreeElement,Comparable
     }
 
     @Override
-    public ITreeElement getRoot() {
+    public TreeRootElement getRoot() {
         ElementType elementType = getType();
         if(elementType == ElementType.ROOT || elementType == ElementType.ROOT_LEAF){
-            return this;
+            return (TreeRootElement) this;
         }else{
             ITreeElement parent = getParent();
             while(true){
                 if(parent != null&&parent.getParent() == null) {
-                    return parent;
+                    return (TreeRootElement)parent;
                 }else{
                     parent = parent.getParent();
                 }
@@ -112,6 +118,7 @@ public class TreeNodeElement<T extends IData> implements ITreeElement,Comparable
             ((TreeNodeElement)children).setParent(this);
             ((TreeNodeElement)children).setPriority();
             ((TreeNodeElement)children).data = this.data.allow(((TreeNodeElement)children).ratio);
+            this.getRoot().put(children.getUniqueName(),children);
             childrens.offer(children);
             return this;
         }else{
@@ -124,6 +131,27 @@ public class TreeNodeElement<T extends IData> implements ITreeElement,Comparable
         return data;
     }
 
+    @Override
+    public List<ITreeElement> getChain() {
+        List<ITreeElement> chain = new ArrayList<>();
+        chain.add(this);
+        ITreeElement temp = parent;
+        while(true) {
+            if (temp != null) {
+                chain.add(temp);
+                temp = temp.getParent();
+            } else {
+                return chain;
+            }
+        }
+    }
+
+    @Override
+    public String getUniqueName() {
+        return name;
+    }
+
+    /*********************Implements Comparable******************/
     @Override
     public int compareTo(ITreeElement target) {
         if( this.getRoot() == this.getRoot() && this.getDepth() == target.getDepth() ){
@@ -159,5 +187,14 @@ public class TreeNodeElement<T extends IData> implements ITreeElement,Comparable
             }
         }
         return result;
+    }
+
+    @Override
+    public String toString() {
+        final StringBuffer sb = new StringBuffer("TreeNodeElement{");
+        sb.append("name='").append(name).append('\'');
+        sb.append(", priority=").append(priority);
+        sb.append('}');
+        return sb.toString();
     }
 }

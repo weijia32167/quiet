@@ -10,4 +10,5 @@ public interface IData {
 
     public IData allow(double ratio);
 
+
 }
