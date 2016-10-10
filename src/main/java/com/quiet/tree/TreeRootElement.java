@@ -6,9 +6,9 @@ package com.quiet.tree;
  * Date   : 2016/10/10
  * Desc   :
  */
-public class RootTreeElement<T extends IData> extends TreeElement{
+public class TreeRootElement<T extends IData> extends TreeNodeElement {
 
-    public RootTreeElement(T data) {
+    public TreeRootElement(T data) {
         super(1.0d);
         super.data = data;
     }

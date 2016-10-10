@@ -10,7 +10,7 @@ import java.util.PriorityQueue;
  * Date   : 2016/10/10
  * Desc   :
  */
-public class TreeElement<T extends IData> implements ITreeElement,Comparable<ITreeElement> {
+public class TreeNodeElement<T extends IData> implements ITreeElement,Comparable<ITreeElement> {
 
     private ITreeElement parent;
 
@@ -22,7 +22,7 @@ public class TreeElement<T extends IData> implements ITreeElement,Comparable<ITr
 
     protected T data;
 
-    public TreeElement(double ratio) {
+    public TreeNodeElement(double ratio) {
         this.ratio = ratio;
     }
 
@@ -109,9 +109,9 @@ public class TreeElement<T extends IData> implements ITreeElement,Comparable<ITr
             if(childrens == null){
                 childrens = new PriorityQueue<>();
             }
-            ((TreeElement)children).setParent(this);
-            ((TreeElement)children).setPriority();
-            ((TreeElement)children).data = this.data.allow(((TreeElement)children).ratio);
+            ((TreeNodeElement)children).setParent(this);
+            ((TreeNodeElement)children).setPriority();
+            ((TreeNodeElement)children).data = this.data.allow(((TreeNodeElement)children).ratio);
             childrens.offer(children);
             return this;
         }else{
