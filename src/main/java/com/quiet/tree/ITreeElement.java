@@ -8,27 +8,25 @@ import java.util.PriorityQueue;
  * Date   : 2016/9/21
  * Desc   :
  */
-public interface ITreeElement<T> {
+public interface ITreeElement<T extends IData> {
 
     public ElementType getType();
 
     public int getDepth();
 
-    public T outputData();
+    public ITreeElement getRoot();
 
-    public ITreeElement<T> getRoot();
+    public ITreeElement getParent();
 
-    public ITreeElement<T> getParent();
-
-    public PriorityQueue<ITreeElement<T>> getChildren();
+    public PriorityQueue<ITreeElement> getChildren();
 
     /*初始化顺序会决定优先级*/
-    public ITreeElement<T> element(ITreeElement<T> children);
+    public ITreeElement element(ITreeElement children);
 
     public int getPriority();
 
-    public void setPriority();
+    public double getRatio();
 
-    public void setParent(ITreeElement<T> parent);
+    public T outputData();
 
 }

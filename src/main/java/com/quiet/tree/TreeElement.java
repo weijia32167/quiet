@@ -1,30 +1,30 @@
 package com.quiet.tree;
 
+import com.quiet.math.Arith;
 
 import java.util.PriorityQueue;
 
 /**
  * Copyright tv.sohu.com
  * Author : jiawei
- * Date   : 2016/9/21
+ * Date   : 2016/10/10
  * Desc   :
  */
-public class TreeElement<T> implements ITreeElement<T>,Comparable<ITreeElement<T>> {
+public class TreeElement<T extends IData> implements ITreeElement,Comparable<ITreeElement> {
 
-    private T data;
+    private ITreeElement parent;
 
-    private ITreeElement<T> parent;
-
-    private PriorityQueue<ITreeElement<T>> childrens;
+    private PriorityQueue<ITreeElement> childrens;
 
     private int priority = -1;
 
-    public TreeElement(T data) {
-        this.data = data;
-    }
+    private double ratio;
 
-    /*树元素不包含额外数据*/
-    public TreeElement() {}
+    protected T data;
+
+    public TreeElement(double ratio) {
+        this.ratio = ratio;
+    }
 
     @Override
     public int getDepth() {
@@ -38,7 +38,7 @@ public class TreeElement<T> implements ITreeElement<T>,Comparable<ITreeElement<T
     }
 
     @Override
-    public PriorityQueue<ITreeElement<T>> getChildren() {
+    public PriorityQueue<ITreeElement> getChildren() {
         if(childrens == null || childrens.size() == 0){
             return null;
         }else{
@@ -47,7 +47,7 @@ public class TreeElement<T> implements ITreeElement<T>,Comparable<ITreeElement<T
     }
 
     @Override
-    public ITreeElement<T> getParent() {
+    public ITreeElement getParent() {
         if(parent == null){
             return null;
         }else{
@@ -56,7 +56,7 @@ public class TreeElement<T> implements ITreeElement<T>,Comparable<ITreeElement<T
     }
 
     @Override
-    public ITreeElement<T> getRoot() {
+    public ITreeElement getRoot() {
         ElementType elementType = getType();
         if(elementType == ElementType.ROOT || elementType == ElementType.ROOT_LEAF){
             return this;
@@ -92,21 +92,55 @@ public class TreeElement<T> implements ITreeElement<T>,Comparable<ITreeElement<T
     }
 
     @Override
-    public T outputData() {
-        if(data != null){
-            return null;
-        }else{
-            return data;
-        }
-    }
-
-    @Override
     public int getPriority() {
         return priority;
     }
 
     @Override
-    public void setPriority() {
+    public double getRatio() {
+        return ratio;
+    }
+
+    @Override
+    public ITreeElement element(ITreeElement children) {
+        double accruedRatio = getChildrenAccruedRatio();
+        double flag = Arith.add(accruedRatio,children.getRatio());
+        if(flag <= 1.0d){
+            if(childrens == null){
+                childrens = new PriorityQueue<>();
+            }
+            ((TreeElement)children).setParent(this);
+            ((TreeElement)children).setPriority();
+            ((TreeElement)children).data = this.data.allow(((TreeElement)children).ratio);
+            childrens.offer(children);
+            return this;
+        }else{
+            throw new IllegalArgumentException("Childrens ratio > 1.0 is not allow!");
+        }
+    }
+
+    @Override
+    public T outputData() {
+        return data;
+    }
+
+    @Override
+    public int compareTo(ITreeElement target) {
+        if( this.getRoot() == this.getRoot() && this.getDepth() == target.getDepth() ){
+            return this.priority - target.getPriority();
+        }
+        throw new IllegalStateException("Not same root or not same depth!");
+    }
+
+    /***********************Help Function********************************************/
+    private final void setParent(ITreeElement parent) {
+        if(this.parent != null){
+            throw new IllegalStateException("You can't invoke function setParent()!");
+        }
+        this.parent = parent;
+    }
+
+    private final void setPriority() {
         ITreeElement parent = getParent();
         if(parent.getChildren() == null){
             priority = 1;
@@ -116,30 +150,14 @@ public class TreeElement<T> implements ITreeElement<T>,Comparable<ITreeElement<T
         }
     }
 
-    @Override
-    public ITreeElement<T> element(ITreeElement<T> children) {
-        children.setParent(this);
-        children.setPriority();
-        if(childrens == null){
-            childrens = new PriorityQueue<>();
+    private double getChildrenAccruedRatio(){
+        double result = 0.0d;
+        PriorityQueue<ITreeElement> childresns = getChildren();
+        if(childresns != null){
+            for(ITreeElement element : childresns){
+                result = Arith.add(result,element.getRatio());
+            }
         }
-        childrens.offer(children);
-        return this;
-    }
-
-    @Override
-    public int compareTo(ITreeElement<T> target) {
-        if( this.getRoot() == this.getRoot() && this.getDepth() == target.getDepth() ){
-            return this.priority - target.getPriority();
-        }
-        throw new IllegalStateException("Not same root or not same depth!");
-    }
-
-    @Override
-    public void setParent(ITreeElement<T> parent) {
-        if(this.parent != null){
-            throw new IllegalStateException("You can't invoke function setParent()!");
-        }
-        this.parent = parent;
+        return result;
     }
 }
