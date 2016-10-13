@@ -1,6 +1,9 @@
-package com.quiet.tree;
+package com.quiet.tree.node;
 
 import com.quiet.math.Arith;
+import com.quiet.tree.data.History;
+import com.quiet.tree.data.ITreeElementData;
+import com.quiet.tree.data.TreeElementData;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,7 +15,7 @@ import java.util.PriorityQueue;
  * Date   : 2016/10/10
  * Desc   :
  */
-public class TreeNodeElement<T extends IData> implements ITreeElement,Comparable<ITreeElement> {
+public class TreeNodeElement implements ITreeElement,Comparable<ITreeElement> {
 
     private ITreeElement parent;
 
@@ -24,11 +27,14 @@ public class TreeNodeElement<T extends IData> implements ITreeElement,Comparable
 
     private String name;
 
-    protected T data;
+    protected ITreeElementData data;
+
+    private History history;
 
     public TreeNodeElement(double ratio,String name) {
         this.ratio = ratio;
         this.name = name;
+        history = new History(10);
     }
 
     /*********************************Implements ITreeElement*****************************************/
@@ -107,6 +113,8 @@ public class TreeNodeElement<T extends IData> implements ITreeElement,Comparable
         return ratio;
     }
 
+
+
     @Override
     public ITreeElement element(ITreeElement children) {
         double accruedRatio = getChildrenAccruedRatio();
@@ -117,7 +125,8 @@ public class TreeNodeElement<T extends IData> implements ITreeElement,Comparable
             }
             ((TreeNodeElement)children).setParent(this);
             ((TreeNodeElement)children).setPriority();
-            ((TreeNodeElement)children).data = this.data.allow(((TreeNodeElement)children).ratio);
+            ((TreeNodeElement)children).data = this.data.allowValue(((TreeNodeElement)children).ratio);
+            ((TreeNodeElement)children).data.setContainer(children);
             this.getRoot().put(children.getUniqueName(),children);
             childrens.offer(children);
             return this;
@@ -127,7 +136,7 @@ public class TreeNodeElement<T extends IData> implements ITreeElement,Comparable
     }
 
     @Override
-    public T outputData() {
+    public ITreeElementData outputData() {
         return data;
     }
 
@@ -149,6 +158,11 @@ public class TreeNodeElement<T extends IData> implements ITreeElement,Comparable
     @Override
     public String getUniqueName() {
         return name;
+    }
+
+    final void backup() {
+        history.backupValue(((TreeElementData)data).getValue());
+        history.backupAccumulation(((TreeElementData)data).getAccumulationData());
     }
 
     /*********************Implements Comparable******************/
@@ -189,11 +203,22 @@ public class TreeNodeElement<T extends IData> implements ITreeElement,Comparable
         return result;
     }
 
+   /* @Override
+    public String toString() {
+        final StringBuffer sb = new StringBuffer("TreeNodeElement{");
+        sb.append("name='").append(name).append('\'');
+        sb.append(", priority=").append(priority);
+        sb.append('}');
+        return sb.toString();
+    }*/
+
     @Override
     public String toString() {
         final StringBuffer sb = new StringBuffer("TreeNodeElement{");
         sb.append("name='").append(name).append('\'');
         sb.append(", priority=").append(priority);
+        sb.append(", data=").append(data);
+        sb.append(", history=").append(history);
         sb.append('}');
         return sb.toString();
     }

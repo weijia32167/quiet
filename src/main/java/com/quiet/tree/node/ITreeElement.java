@@ -1,4 +1,6 @@
-package com.quiet.tree;
+package com.quiet.tree.node;
+
+import com.quiet.tree.data.ITreeElementData;
 
 import java.util.List;
 import java.util.PriorityQueue;
@@ -9,7 +11,7 @@ import java.util.PriorityQueue;
  * Date   : 2016/9/21
  * Desc   :
  */
-public interface ITreeElement<T extends IData> {
+public interface ITreeElement {
 
     public ElementType getType();
 
@@ -28,11 +30,13 @@ public interface ITreeElement<T extends IData> {
 
     public double getRatio();
 
-    public T outputData();
+    public ITreeElementData outputData();
 
     public String getUniqueName();
     /**当前节点到根节点的路径中所有经过的节点*/
     public List<ITreeElement> getChain();
+
+    /*public void backup();*/
 
 
 }
