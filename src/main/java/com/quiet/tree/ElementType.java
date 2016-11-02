@@ -1,4 +1,4 @@
-package com.quiet.tree.node;
+package com.quiet.tree;
 
 /**
  * Copyright tv.sohu.com

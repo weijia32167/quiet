@@ -12,6 +12,7 @@
         <log4j2.version>2.5</log4j2.version>
         <slf4j.version>1.7.10</slf4j.version>
         <disruptor.version>3.3.4</disruptor.version>
+        <jama.version>1.0.3</jama.version>
     </properties>
 
     <scm>
@@ -32,7 +33,6 @@
             <name>Nexus Snapshot Repository</name>
             <url>http://10.10.53.128:8081/nexus/content/repositories/snapshots/</url>
         </snapshotRepository>
-
     </distributionManagement>
 
     <dependencies>
@@ -98,6 +98,12 @@
             <groupId>com.lmax</groupId>
             <artifactId>disruptor</artifactId>
             <version>${disruptor.version}</version>
+        </dependency>
+        <!--矩阵计算-->
+        <dependency>
+            <groupId>gov.nist.math</groupId>
+            <artifactId>jama</artifactId>
+            <version>${jama.version}</version>
         </dependency>
 
     </dependencies>
