@@ -17,8 +17,8 @@ public class MartixTest {
 
     public static final Logger logger = LoggerFactory.getLogger(MartixTest.class);
 
-   /* private double[][] data = {{3,4},{4,5}};*/
-    private double[][] data = {{3,3},{4.5}};
+    private double[][] data = {{3,4},{4,5}};
+  /*  private double[][] data = {{3,3},{4.5}};*/
     private Matrix matrix = Matrix.constructWithCopy(data);
 
     @Before
