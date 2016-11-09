@@ -234,6 +234,11 @@ public class LimitQueue<E> implements Deque<E> {
         return limit;
     }
 
+
+    public boolean isFull(){
+        return size() == limit;
+    }
+
     @Override
     public String toString() {
         final StringBuffer sb = new StringBuffer("{");

@@ -11,16 +11,16 @@ import Jama.Matrix;
 public final class LinearRegression {
     /**
      * 矩阵kx=y,利用最小二乘法求解k
-     * 最小二乘解（OLS）：Ordinary Least Squares
+     * 最小二乘解（OLS）：Ordinary Least Squares  假设高斯分布和最大似然思想推导而来
      * https://en.wikipedia.org/wiki/Ordinary_least_squares
      * Ax=b
      */
-    public static final Matrix OLS(Matrix x,Matrix y) {
-        return x.transpose().times(x).inverse().times(x.transpose()).times(y);
+    public static final Matrix ols(Matrix x,Matrix y) {
+        return x.transpose().times(x).inverse().times(x.transpose().times(y));
     }
     /**
-     * 用1-范数正则化OLS
-     * Feature Selection
+     * 一范数
+     * Feature Selection                    假设拉普拉斯分布和最大似然思想推导而来
      * Interpretability
      **/
     public static final Matrix lasso(Matrix x,Matrix y) {

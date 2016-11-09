@@ -11,9 +11,9 @@ import java.util.Iterator;
  * Date   : 2016/10/31
  * Desc   :
  */
-public class IntegerLimitQuene extends LimitQueue<Integer> implements IComputability {
+public class IntegerLimitQueue extends LimitQueue<Integer> implements IComputability {
 
-    public IntegerLimitQuene(int limit) {
+    public IntegerLimitQueue(int limit) {
         super(limit);
     }
 

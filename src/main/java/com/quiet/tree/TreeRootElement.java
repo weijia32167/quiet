@@ -1,9 +1,9 @@
 package com.quiet.tree;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import com.quiet.collections.queue.DoubleLimitQueue;
+import com.quiet.collections.queue.IntegerLimitQueue;
+
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -22,7 +22,7 @@ public class TreeRootElement extends TreeNodeElement implements IRoot {
      */
     public TreeRootElement(String name,int size) {
         super(1.0d,name);
-        history = new History(size);
+        history = new History(size,size);
         treeNodeElements = new ConcurrentHashMap<>();
         treeNodeElements.put(name,this);
     }
@@ -52,41 +52,12 @@ public class TreeRootElement extends TreeNodeElement implements IRoot {
     }
 
     @Override
-    public final synchronized void addAccumulationFiled(String key, int initValue) {
+    public void initAccumulation(String fieldName) {
         Set<String> nodeNames = treeNodeElements.keySet();
+        TreeNodeElement treeNodeElement = null;
         for(String nodeName : nodeNames){
-            TreeNodeElement treeNodeElement = treeNodeElements.get(nodeName);
-            treeNodeElement.addAccumulationFiled0(key,initValue);
-        }
-    }
-
-    @Override
-    public final synchronized void addDivisibleFiled(String key, double initValue) {
-        Set<String> nodeNames = treeNodeElements.keySet();
-        for(String nodeName : nodeNames){
-            TreeNodeElement treeNodeElement = treeNodeElements.get(nodeName);
-            treeNodeElement.addDivisibleFiled0(key,initValue);
-        }
-    }
-
-    @Override
-    public void increment(String nodeName, String fieldName) {
-        TreeNodeElement treeElement = getTreeElement(nodeName);
-        if(treeElement==null){
-            throw new IllegalArgumentException("No Tree Node named "+nodeName);
-        }else{
-            List<TreeNodeElement> chain = treeElement.getChain();
-            for(TreeNodeElement temp : chain){
-                temp.increment0(fieldName);
-            }
-        }
-    }
-
-    @Override
-    public void backup() {
-        Set<String> nodeNameSet = treeNodeElements.keySet();
-        for( String nodeName : nodeNameSet ){
-            treeNodeElements.get(nodeName)._backup();
+            treeNodeElement = treeNodeElements.get(nodeName);
+            treeNodeElement.setAccumulation0(fieldName);
         }
     }
 
@@ -99,6 +70,38 @@ public class TreeRootElement extends TreeNodeElement implements IRoot {
             return treeElement.getAccumulation0(uniqueFieldName);
         }
     }
+
+    @Override
+    public void increment(String nodeName, String fieldName) {
+        TreeNodeElement treeElement = getTreeElement(nodeName);
+        if(treeElement==null){
+            throw new IllegalArgumentException("No Tree Node named "+nodeName);
+        }else{
+            List<TreeNodeElement> chain = treeElement.getChain();
+            for(TreeNodeElement temp : chain){
+                temp.increment0(fieldName,1);
+            }
+        }
+    }
+    @Override
+    public void increment(String nodeName, String fieldName,int number) {
+        if(number <= 0){
+            throw new IllegalArgumentException("number must > 0");
+        }else{
+            TreeNodeElement treeElement = getTreeElement(nodeName);
+            if(treeElement==null){
+                throw new IllegalArgumentException("No Tree Node named "+nodeName);
+            }else{
+                List<TreeNodeElement> chain = treeElement.getChain();
+                for(TreeNodeElement temp : chain){
+                    temp.increment0(fieldName,number);
+                }
+            }
+        }
+    }
+
+
+
 
     @Override
     public void setDivisible(String fieldName, double value) {
@@ -128,6 +131,42 @@ public class TreeRootElement extends TreeNodeElement implements IRoot {
         }else{
             return treeElement.history;
         }
+    }
+
+    @Override
+    public  List<Integer> getAccumulationHistory(String nodeName, String fieldName) {
+        History history = getHistory(nodeName);
+        IntegerLimitQueue quene = history.getAccumulationQueue(fieldName);
+        List<Integer> result = new ArrayList<>();
+        result.addAll(quene);
+        return result;
+    }
+
+    @Override
+    public List<Double> getDivisibleHistory(String nodeName, String fieldName) {
+        History history = getHistory(nodeName);
+        DoubleLimitQueue quene = history.getDivisibleQueue(fieldName);
+        List<Double> result =  new ArrayList<>();
+        result.addAll(quene);
+        return result;
+    }
+
+    @Override
+    public List<Double> getAverageAccumulationHistory(String nodeName, String fieldName) {
+        History history = getHistory(nodeName);
+        DoubleLimitQueue quene = history.getAccumulationAverageQueue(fieldName);
+        List<Double> result = new ArrayList<>();
+        result.addAll(quene);
+        return result;
+    }
+
+    @Override
+    public List<Double> getAverageDivisibleHistory(String nodeName, String fieldName) {
+        History history = getHistory(nodeName);
+        DoubleLimitQueue quene = history.getDivisibleAverageQueue(fieldName);
+        List<Double> result = new ArrayList<>();
+        result.addAll(quene);
+        return result;
     }
 
     final void put(String name, TreeNodeElement node){

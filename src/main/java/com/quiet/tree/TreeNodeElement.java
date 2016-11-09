@@ -24,9 +24,9 @@ class TreeNodeElement implements ITreeElement,Comparable<ITreeElement> {
     private String name;
 
     /*普通数据*/
-    private Map<String,Double> divisible;
+    protected Map<String,Double> divisible;
     /*状态数据,用于累加记录状态的*/
-    private Map<String,AtomicInteger> accumulation;
+    protected Map<String,AtomicInteger> accumulation;
 
     protected History history;
 
@@ -34,8 +34,6 @@ class TreeNodeElement implements ITreeElement,Comparable<ITreeElement> {
         this.ratio = ratio;
         this.name = name;
     }
-
-
 
     /*********************************Implements ITreeElement*****************************************/
     @Override
@@ -135,7 +133,7 @@ class TreeNodeElement implements ITreeElement,Comparable<ITreeElement> {
             TreeNodeElement child0 = (TreeNodeElement)child;
             child0.setParent(this);
             child0.setPriority();
-            child0.history = new History(this.getRoot().history.getSize());
+            child0.history = new History(this.getRoot().history.getSize(),this.getRoot().history.getAverageSize());
             this.getRoot().put(child.getUniqueName(),child0);
             childrens.offer(child0);
             return this;
@@ -171,14 +169,16 @@ class TreeNodeElement implements ITreeElement,Comparable<ITreeElement> {
         return name;
     }
 
-    final void _backup() {
+
+
+ /*   final void _backup() {
         history.backupDivisible(divisible);
         history.backupAccumulation(accumulation);
         clear();
-    }
+    }*/
 
    private final void clear(){
-   /*     if(divisible!=null){
+       /* if(divisible!=null){
             Set<String> divisibleFieldNames = divisible.keySet();
             for(String divisibleFieldName : divisibleFieldNames){
                 setDivisible0(divisibleFieldName,0);
@@ -230,7 +230,7 @@ class TreeNodeElement implements ITreeElement,Comparable<ITreeElement> {
         return result;
     }
 
-    int increment0(String fieldName){
+    int increment0(String fieldName,int number){
         if(this.accumulation == null){
             throw new IllegalArgumentException("Accumulation Data named "+fieldName +" is't exists!");
         }else{
@@ -238,10 +238,11 @@ class TreeNodeElement implements ITreeElement,Comparable<ITreeElement> {
             if(value == null){
                 throw new IllegalArgumentException("Accumulation Data named "+fieldName +" is't exists!");
             }else{
-                return value.incrementAndGet();
+                return value.addAndGet(number);
             }
         }
     }
+
 
     int getAccumulation0(String fieldName){
        return _getAccumulation0(fieldName).intValue();
@@ -285,9 +286,25 @@ class TreeNodeElement implements ITreeElement,Comparable<ITreeElement> {
         for(TreeNodeElement treeNodeElement : chain){
             ratio=Arith.mul(ratio,treeNodeElement.getRatio());
         }
-        this.divisible.put(fieldName,Arith.mul(value,ratio));
-
+        value = Arith.mul(value,ratio);
+        this.divisible.put(fieldName,value);
+        this.history.backupDivisible(fieldName,value);
     }
+
+    void setAccumulation0(String fieldName) {
+        if(this.accumulation == null){
+            this.accumulation = new LinkedHashMap<>();
+        }
+        if(this.accumulation.get(fieldName)==null){
+            addAccumulationFiled0(fieldName,0);
+        }
+        AtomicInteger number = this.accumulation.get(fieldName);
+        int current = number.get();
+        number.set(0);
+        this.history.backupAccumulation(fieldName,current);
+    }
+
+
 
     void addDivisibleFiled0(String fieldName, double initValue) {
         if(this.divisible == null){

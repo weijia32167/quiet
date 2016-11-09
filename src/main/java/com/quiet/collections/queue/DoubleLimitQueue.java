@@ -17,6 +17,8 @@ public class DoubleLimitQueue extends LimitQueue<Double> implements IComputabili
         super(limit);
     }
 
+
+
     @Override
     public double average(int scale) {
         if(scale<0){

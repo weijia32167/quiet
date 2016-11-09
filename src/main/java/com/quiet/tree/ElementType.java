@@ -5,9 +5,7 @@ package com.quiet.tree;
  * Author : jiawei
  * Date   : 2016/9/21
  * Desc   :
- *      ROOT    LEAF
- *
- *
+ *      树根 树叶 既不是树根也不是树叶 既是树根也是树叶
  */
 public enum ElementType {
 
