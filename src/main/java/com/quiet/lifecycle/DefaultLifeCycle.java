@@ -9,21 +9,21 @@ package com.quiet.lifecycle;
 public class DefaultLifeCycle extends AbsLifeCycle {
 
     @Override
-    public void doInit (){
+    public void doInit () throws Throwable{
 
     }
 
     @Override
-    public void doStart (){
+    public void doStart () throws Throwable{
 
     }
 
     @Override
-    public void doStop (){
+    public void doStop () throws Throwable{
 
     }
     @Override
-    public void doDestory (){
+    public void doDestory () throws Throwable{
 
     }
 

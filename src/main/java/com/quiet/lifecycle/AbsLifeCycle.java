@@ -278,13 +278,13 @@ public abstract class AbsLifeCycle implements ILifeCycle{
     }
     /******************************need Override**********************************/
 
-    public abstract void doInit();
+    public abstract void doInit() throws Throwable;
 
-    public abstract void doStart();
+    public abstract void doStart() throws Throwable;
 
-    public abstract void doStop();
+    public abstract void doStop() throws Throwable;
 
-    public abstract void doDestory();
+    public abstract void doDestory() throws Throwable;
 
     private void sleep(long time){
         try {
