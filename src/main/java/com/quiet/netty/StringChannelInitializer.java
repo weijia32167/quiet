@@ -49,7 +49,9 @@ public class StringChannelInitializer extends ChannelInitializer<NioSocketChanne
         this.delimiter = Unpooled.copiedBuffer(delimiter.getBytes());
         stringEncoder = new StringEncoder(charset);
         stringDecoder = new StringDecoder(charset);
-        loggingHandler = new LoggingHandler(level);
+        if(level!=null){
+            loggingHandler = new LoggingHandler(level);
+        }
         this.businessHandler = businessHandler;
     }
 

@@ -1,4 +1,4 @@
-package common;
+package com.quiet.collections;
 
 import com.quiet.collections.queue.DoubleLimitQueue;
 import org.junit.Before;
@@ -16,9 +16,9 @@ import java.util.Iterator;
  * Date   : 2016/10/12
  * Desc   :
  */
-public class FixQuene {
+public class LimitQueneTest {
 
-    public static final Logger logger = LoggerFactory.getLogger(FixQuene.class);
+    public static final Logger logger = LoggerFactory.getLogger(LimitQueneTest.class);
 
     public static final int LIMIT_SIZE = 3;
 
