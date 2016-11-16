@@ -26,7 +26,7 @@ public interface Chain<Request,Response,Processor extends Handler<Request,Respon
      */
     public void setExceptionHandlerStrategy(ExceptionHandlerStrategy exceptionHandlerStrategy);
 
-    public void setCompleteCondition(CompleteCondition completeCondition);
+    public void setCompleteCondition(CompleteCondition<Request,Response> completeCondition);
 
     /**
      * The responsibility chain is responsible for calling the real processor in turn。
