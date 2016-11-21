@@ -1,6 +1,7 @@
 package com.quiet.math;
 
 import java.math.BigDecimal;
+import java.math.BigInteger;
 
 public final class Arith{
     //默认除法运算精度
@@ -89,4 +90,15 @@ public final class Arith{
         BigDecimal one = new BigDecimal("1");
         return b.divide(one,scale,BigDecimal.ROUND_HALF_UP).doubleValue();
     }
+
+    /**
+     * 求解最大公约数
+     */
+    public static int gcd(int a,int b){
+        BigInteger aBigInteger = BigInteger.valueOf(a);
+        BigInteger bBigInteger = BigInteger.valueOf(b);
+        BigInteger result = aBigInteger.gcd(bBigInteger);
+        return result.intValue();
+    }
+
 }
