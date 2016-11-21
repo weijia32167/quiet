@@ -11,7 +11,9 @@ import java.util.concurrent.atomic.AtomicInteger;
  * Date   : 2015/12/25
  * Desc   :
  */
-public class StandardChain<Request,Response,Handler extends com.quiet.chain.Handler<Request,Response>> implements Chain<Request,Response,Handler> {
+public class StandardChain<Request,Response,Handler extends com.quiet.chain.Handler<Request,Response>>
+        extends NamedHandler<Request,Response>
+        implements Chain<Request,Response,Handler> {
 
     private List<Handler> elements = new CopyOnWriteArrayList<>();
 
@@ -20,6 +22,14 @@ public class StandardChain<Request,Response,Handler extends com.quiet.chain.Hand
     private ExceptionHandlerStrategy exceptionHandlerStrategy = ExceptionHandlerStrategy.BREAK_THROW_EXCEPTION;
 
     private CompleteCondition completeCondition;
+
+    public StandardChain() {
+        super();
+    }
+
+    public StandardChain(String name) {
+        super(name);
+    }
 
     @Override
     public void setExceptionHandlerStrategy(ExceptionHandlerStrategy exceptionHandlerStrategy) {
@@ -52,7 +62,7 @@ public class StandardChain<Request,Response,Handler extends com.quiet.chain.Hand
             Handler handler = current();
             index.getAndIncrement();
             try{
-                handler.doHandler(request,response,this);
+                handler.doHandler(request,response);
                 if(completeCondition!=null){
                     if(completeCondition.isCompleteCondition(request,response)){
                         break;

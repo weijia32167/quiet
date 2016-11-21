@@ -10,12 +10,16 @@ public abstract class NamedHandler<Request,Response> implements Handler<Request,
 
     private String name;
 
+
+    public NamedHandler() {
+        this.name = this.getClass().getName();
+    }
     public NamedHandler(String name) {
         this.name = name;
     }
 
     @Override
-    public String getUnique() {
+    public final String getUnique() {
         return name;
     }
 

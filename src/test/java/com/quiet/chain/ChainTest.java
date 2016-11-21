@@ -31,7 +31,7 @@ public class ChainTest {
 
         chain.add(new NamedHandler<List<Integer>, Integer>("One") {
             @Override
-            public void doHandler(List<Integer> list, Integer integer, Chain chain) throws Throwable {
+            public void doHandler(List<Integer> list, Integer integer) throws Throwable {
                 System.out.println(this+":"+list);
                 int i = 1/0;
                 System.out.println("can't invoke there！");
@@ -41,7 +41,7 @@ public class ChainTest {
         chain.add(new NamedHandler<List<Integer>, Integer>("Two") {
 
             @Override
-            public void doHandler(List<Integer> list, Integer integer, Chain chain) throws Throwable {
+            public void doHandler(List<Integer> list, Integer integer) throws Throwable {
                 list.add(2);
                 list.add(3);
                 System.out.println(this.toString()+":"+list);
@@ -51,10 +51,13 @@ public class ChainTest {
         chain.add(new NamedHandler<List<Integer>, Integer>("Three") {
 
             @Override
-            public void doHandler(List<Integer> list, Integer integer, Chain chain) throws Throwable {
+            public void doHandler(List<Integer> list, Integer integer) throws Throwable {
                 System.out.println(this.toString()+":"+list);
             }
         });
+
+
+
         try {
             List<Integer> list = new ArrayList<>();
             list.add(1);
@@ -66,8 +69,46 @@ public class ChainTest {
 
     @Test
     public void test(){
+        Chain<Request,Response,Handler<Request,Response>> chain = new StandardChain<>();
+        chain.setCompleteCondition(new CompleteCondition<Request, Response>() {
+            @Override
+            public boolean isCompleteCondition(Request request, Response response) {
+                return response.isSuccess();
+            }
+        });
+        chain.add(new ConfHandler());
+        chain.add(new SameHandler());
+        chain.add(new RandomHandler());
+        Request request = new Request();
+        Response response = new Response();
+        request.addConf(1);
+        request.addConf(2);
+        request.addConf(3);
 
+
+        request.addSame(3);
+        request.addSame(4);
+        request.addSame(6);
+
+        request.addLimit(3);
+        request.addLimit(5);
+        request.addLimit(7);
+
+        request.addAll(2);
+        request.addAll(3);
+        request.addAll(6);
+        request.addAll(7);
+        request.addAll(8);
+        try {
+            chain.doHandler(request,response);
+            System.out.println(response.getIntegerFlags());
+        } catch (Throwable throwable) {
+            throwable.printStackTrace();
+        }
     }
+
+
+
 
 
 }

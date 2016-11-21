@@ -5,10 +5,9 @@ package com.quiet.chain;
  * Author : jiawei
  * Date   : 2016/5/31
  * Desc   : Provider Template For Responsibility Chain.
- *
- *       Request And Response is parameters needed to be processed
+ *          Request And Response is parameters needed to be processed.
  */
-public interface Chain<Request,Response,Processor extends Handler<Request,Response>> {
+public interface Chain<Request,Response,Processor extends Handler<Request,Response>> extends Handler<Request,Response>{
     /**
      * @param chainElement will be add to tail of Chain
      * @return The index of Chain

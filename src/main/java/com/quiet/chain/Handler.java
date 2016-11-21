@@ -8,7 +8,7 @@ package com.quiet.chain;
  */
 public interface Handler<Request,Response> {
 
-    public void doHandler(Request request, Response response, Chain chain) throws Throwable;
+    public void doHandler(Request request, Response response) throws Throwable;
 
     public String getUnique();
 
