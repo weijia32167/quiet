@@ -11,7 +11,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  * Date   : 2016/10/10
  * Desc   :
  */
-class TreeNodeElement implements ITreeElement,Comparable<ITreeElement> {
+public class TreeNodeElement implements ITreeElement,Comparable<ITreeElement> {
 
     private TreeNodeElement parent;
 
