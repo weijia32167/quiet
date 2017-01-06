@@ -69,7 +69,7 @@ public final class IPUtil {
      * 判断IPv4地址是否为私有网络地址
      */
     public static boolean isPrivateNetwork(String clientIP) throws IllegalArgumentException{
-        isIPv4(clientIP);
+        checkIPv4(clientIP);
         long clientIPValue = convert(clientIP);
         if(Start_A_PrivateNetwork<=clientIPValue&&clientIPValue<=End_A_PrivateNetwork ||
            Start_B_PrivateNetwork<=clientIPValue&&clientIPValue<=End_B_PrivateNetwork ||
@@ -83,7 +83,7 @@ public final class IPUtil {
      * 判断IPv4地址是否为本地回环地址(127.0.0.1)
      */
     public static boolean isLocalLoopback(String clientIP) throws IllegalArgumentException{
-        isIPv4(clientIP);
+        checkIPv4(clientIP);
         long clientIPValue = convert(clientIP);
         if(Local_Loopback == clientIPValue){
             return true;
@@ -94,12 +94,23 @@ public final class IPUtil {
     /**
      * 判断当前地址是否为IPv4地址。
      * 如果是，正常返回；
-     * 否则抛出IllegalArgumentException异常
+     * 否则返回false
      */
     public static boolean isIPv4(String clientIP) throws IllegalArgumentException{
         Matcher ipv4Matcher = IPV4_PATTERN.matcher(clientIP);
         return ipv4Matcher.matches();
     }
+    /**
+     * 判断当前地址是否为IPv4地址。
+     * 如果是，正常返回；
+     * 否则抛出IllegalArgumentException异常
+     */
+    public static void checkIPv4(String clientIP) throws IllegalArgumentException{
+         if(!isIPv4(clientIP)){
+             throw new IllegalArgumentException("clientIP is not IPV4!");
+         }
+    }
+
     /**
      * 随机生成IPV4公网地址
      * */
