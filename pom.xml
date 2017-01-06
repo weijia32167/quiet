@@ -11,9 +11,9 @@
         <junit.version>4.8.2</junit.version>
         <log4j2.version>2.5</log4j2.version>
         <slf4j.version>1.7.10</slf4j.version>
-        <disruptor.version>3.3.4</disruptor.version>
         <jama.version>1.0.3</jama.version>
         <netty.version>4.0.35.Final</netty.version>
+        <javassist.version>3.20.0-GA</javassist.version>
     </properties>
 
     <scm>
@@ -43,6 +43,12 @@
             <artifactId>junit</artifactId>
             <version>${junit.version}</version>
             <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.javassist</groupId>
+            <artifactId>javassist</artifactId>
+            <version>${javassist.version}</version>
         </dependency>
 
         <!-- https://mvnrepository.com/artifact/org.slf4j/slf4j-api -->
@@ -94,12 +100,7 @@
             <artifactId>log4j-core</artifactId>
             <version>${log4j2.version}</version>
         </dependency>
-        <!-- https://mvnrepository.com/artifact/com.lmax/disruptor -->
-        <dependency>
-            <groupId>com.lmax</groupId>
-            <artifactId>disruptor</artifactId>
-            <version>${disruptor.version}</version>
-        </dependency>
+
         <!--矩阵计算-->
         <dependency>
             <groupId>gov.nist.math</groupId>

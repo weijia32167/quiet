@@ -25,7 +25,7 @@ public abstract class AbsLifeCycle implements ILifeCycle{
 
     private Lock lock = new ReentrantLock();
 
-    protected Logger log = LoggerFactory.getLogger(this.getClass());
+    protected Logger logger = LoggerFactory.getLogger(this.getClass());
 
     protected volatile AtomicReference<LifeCycleState> state = new AtomicReference<LifeCycleState>();
 
@@ -173,7 +173,6 @@ public abstract class AbsLifeCycle implements ILifeCycle{
         }finally{
             lock.unlock();
         }
-
     }
 
 
