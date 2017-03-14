@@ -1,123 +1,110 @@
+
 package com.quiet.tree;
 
-import com.quiet.collections.queue.DoubleLimitQueue;
-import com.quiet.collections.queue.IntegerLimitQueue;
+import com.quiet.data.TimeSlotNumber;
+import com.quiet.data.TimestampNumber;
+import com.quiet.collections.queue.NumberRingBuffer;
 
+import java.lang.reflect.Field;
+import java.sql.Timestamp;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
  * Copyright tv.sohu.com
  * Author : jiawei
- * Date   : 2016/10/12
- * Desc   : 历史记录
+ * Date   : 2017/3/10
+ * Desc   :
  */
-public class History {
-    /**
-     * 历史数据保留多少
-     */
-    private int size;
-    /**
-     * 历史均值数据保留多少
-     */
-    private int averageSize;
-    /**
-     * 历史数据
-     */
-    private Map<String,DoubleLimitQueue> divisibleQueueMap;
+public final class History {
+    /*字段历史数据*/
+    private final Map<Field, NumberRingBuffer<TimestampNumber>> fieldHistory;
+    /*字段历史数据均值*/
+    private final Map<Field, NumberRingBuffer<TimeSlotNumber>> fieldAvgHistory;
 
-    private Map<String,IntegerLimitQueue> accumulationQueueMap;
-    /**
-     * 历史数据均值记录
-     **/
-    private Map<String,DoubleLimitQueue> divisibleAverageQueueMap;
+    private final int size;
 
-    private Map<String,DoubleLimitQueue> accumulationAverageQueueMap;
+    private final int avgSize;
+    /*均值的精确度*/
+    private final int scale;
 
-    public History(int size,int averageSize) {
-        if(size <= 0){
-            throw new IllegalArgumentException("size must > 0!");
+    public History(int size, int scale) {
+        this(size, size, scale);
+    }
+
+    public History(int size, int avgSize, int scale) {
+        if (size <= 0 || avgSize <= 0) {
+            throw new IllegalArgumentException("History RingBuffer size <= 0!");
+        }
+        if (scale < 0) {
+            throw new IllegalArgumentException("History RingBuffer avg scale < 0!");
         }
         this.size = size;
-        this.averageSize = averageSize;
-        divisibleQueueMap = new HashMap<>();
-        accumulationQueueMap = new HashMap<>();
-        divisibleAverageQueueMap = new HashMap<>();
-        accumulationAverageQueueMap = new HashMap<>();
+        this.avgSize = avgSize;
+        this.scale = scale;
+        fieldHistory = new HashMap<>();
+        fieldAvgHistory = new HashMap<>();
     }
 
-    int getSize(){
-         return size;
-     }
+    public void add(Field field, Number value) {
+        add(field, new Timestamp(System.currentTimeMillis()), value);
+    }
 
-    int getAverageSize() {return averageSize;}
-
-    public synchronized void backupDivisible(String name, Double value){
-        DoubleLimitQueue doubleLimitQueue = divisibleQueueMap.get(name);
-        if(doubleLimitQueue == null){
-            doubleLimitQueue = new DoubleLimitQueue(size);
-            divisibleQueueMap.put(name,doubleLimitQueue);
-        }
-        if(doubleLimitQueue.isFull()){
-            DoubleLimitQueue averageDoubleLimitQueue = divisibleAverageQueueMap.get(name);
-            if(averageDoubleLimitQueue == null){
-                averageDoubleLimitQueue = new DoubleLimitQueue(averageSize);
-                divisibleAverageQueueMap.put(name,averageDoubleLimitQueue);
+    public void add(Field field, Timestamp timestamp, Number value) {
+        NumberRingBuffer dataBuffer;
+        NumberRingBuffer dataAvgBuffer;
+        if (!fieldHistory.containsKey(field)) {
+            assert !fieldAvgHistory.containsKey(field);
+            dataBuffer = new NumberRingBuffer<TimestampNumber>(size);
+            dataAvgBuffer = new NumberRingBuffer<TimeSlotNumber>(avgSize);
+            synchronized (field) {
+                fieldHistory.put(field, dataBuffer);
+                fieldAvgHistory.put(field, dataAvgBuffer);
             }
-            averageDoubleLimitQueue.add(doubleLimitQueue.average(2));
+        } else {
+            assert fieldAvgHistory.containsKey(field);
+            dataBuffer = fieldHistory.get(field);
+            dataAvgBuffer = fieldAvgHistory.get(field);
         }
-        doubleLimitQueue.add(value);
-    }
-
-    public void backupAccumulation(String name,Integer value){
-        IntegerLimitQueue integerLimitQueue =  accumulationQueueMap.get(name);
-        if(integerLimitQueue == null){
-            integerLimitQueue = new IntegerLimitQueue(size);
-            accumulationQueueMap.put(name,integerLimitQueue);
+        synchronized (field) {
+            TimestampNumber timestampNumber = new TimestampNumber(timestamp, value);
+            dataBuffer.in(timestampNumber);
+            List<TimestampNumber> timestampNumberList = dataBuffer.list();
+            Timestamp start = timestampNumberList.get(0).getTimestamp();
+            Timestamp end = timestampNumberList.get(timestampNumberList.size() - 1).getTimestamp();
+            Number average = dataBuffer.average(scale);
+            TimeSlotNumber timeSlotNumber = new TimeSlotNumber(start, end, average);
+            dataAvgBuffer.in(timeSlotNumber);
         }
-        if(integerLimitQueue.isFull()){
-            DoubleLimitQueue averageDoubleLimitQueue = accumulationAverageQueueMap.get(name);
+    }
 
-            if(averageDoubleLimitQueue == null){
-                averageDoubleLimitQueue = new DoubleLimitQueue(averageSize);
-                accumulationAverageQueueMap.put(name,averageDoubleLimitQueue);
-            }
-            averageDoubleLimitQueue.add(integerLimitQueue.average(3));
+    public List<TimestampNumber> getFieldData(Field field) {
+        if (field == null || fieldHistory == null || fieldHistory.get(field) == null) {
+            return null;
+        } else {
+            return fieldHistory.get(field).list();
         }
-        integerLimitQueue.add(value);
+
     }
 
-    public DoubleLimitQueue getDivisibleQueue(String fieldName){
-        return divisibleQueueMap.get(fieldName);
+    public List<TimeSlotNumber> getFieldAvgData(Field field) {
+        if (field == null || fieldAvgHistory == null || fieldAvgHistory.get(field) == null) {
+            return null;
+        } else {
+            return fieldAvgHistory.get(field).list();
+        }
     }
 
-    public IntegerLimitQueue getAccumulationQueue(String fieldName){
-        return accumulationQueueMap.get(fieldName);
+    int getSize() {
+        return size;
     }
 
-    public DoubleLimitQueue getDivisibleAverageQueue(String fieldName){
-        return  divisibleAverageQueueMap.get(fieldName);
+    int getAvgSize() {
+        return avgSize;
     }
 
-    public DoubleLimitQueue getAccumulationAverageQueue(String fieldName){
-        return  accumulationAverageQueueMap.get(fieldName);
-    }
-
-
-
-
-    @Override
-    public String toString() {
-        final StringBuffer sb = new StringBuffer("{");
-        sb.append("size={").
-                     append("History=").append(size).
-                     append(",Average=").append(averageSize).
-                append("}");
-        sb.append(",History={").append(accumulationQueueMap).append(",");
-        sb.append(divisibleQueueMap).append("}");
-        sb.append(", Average={").append(divisibleAverageQueueMap).append(",");
-        sb.append(accumulationAverageQueueMap).append("}");
-        sb.append('}');
-        return sb.toString();
+    int getScale() {
+        return scale;
     }
 }

@@ -8,6 +8,6 @@ package com.quiet.collections;
  */
 public interface IComputability {
     /*计算均值，保留sale位小数*/
-    public double average(int scale);
+    public Number average(int scale);
 
 }

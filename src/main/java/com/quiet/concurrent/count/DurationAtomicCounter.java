@@ -1,4 +1,4 @@
-package com.quiet.count;
+package com.quiet.concurrent.count;
 
 import java.util.concurrent.TimeUnit;
 

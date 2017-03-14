@@ -1,10 +1,10 @@
 package com.quiet.tree;
 
-import com.quiet.collections.queue.DoubleLimitQueue;
-import com.quiet.collections.queue.IntegerLimitQueue;
+import com.quiet.data.TimeSlotNumber;
+import com.quiet.data.TimestampNumber;
 
+import java.lang.reflect.Field;
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Copyright tv.sohu.com
@@ -12,35 +12,35 @@ import java.util.concurrent.ConcurrentHashMap;
  * Date   : 2016/10/10
  * Desc   :
  */
-public class TreeRootElement extends TreeNodeElement implements IRoot {
+public class TreeRootElement extends TreeNodeElement implements ITreeRoot {
 
-    private final Map<String,TreeNodeElement> treeNodeElements;
+    final LinkedHashMap<String, ITreeElement> treeNodeElements;
 
     /**
      * @param name 唯一标识符
      * @param size 元素数据备份数据量
      */
-    public TreeRootElement(String name,int size) {
-        super(1.0d,name);
-        history = new History(size,size);
-        treeNodeElements = new ConcurrentHashMap<>();
+    public TreeRootElement(String name, int size, int scale) {
+        super(name, size, scale);
+        history = new History(size, scale);
+        treeNodeElements = new LinkedHashMap<>();
         treeNodeElements.put(name,this);
     }
 
     @Override
-    public final TreeNodeElement getTreeElement(String name) {
+    public final ITreeElement getTreeElement(String name) {
         return treeNodeElements.get(name);
     }
 
-    public Map<String, TreeNodeElement> getTreeElements() {
+    public LinkedHashMap<String, ITreeElement> getTreeElements() {
         return treeNodeElements;
     }
 
     @Override
-    public Map<String, TreeNodeElement> getLeafTreeElements() {
-        Map<String, TreeNodeElement> result = null;
+    public LinkedHashMap<String, ITreeElement> getLeafTreeElements() {
+        LinkedHashMap<String, ITreeElement> result = null;
         if(treeNodeElements!=null){
-            result = new HashMap<>();
+            result = new LinkedHashMap<>();
             Set<String> nodeNames = treeNodeElements.keySet();
             for(String nodeName : nodeNames ){
                 if(treeNodeElements.get(nodeName).isLeaf()){
@@ -52,129 +52,113 @@ public class TreeRootElement extends TreeNodeElement implements IRoot {
     }
 
     @Override
-    public void initAccumulation(String fieldName) {
-        Set<String> nodeNames = treeNodeElements.keySet();
-        TreeNodeElement treeNodeElement = null;
-        for(String nodeName : nodeNames){
-            treeNodeElement = treeNodeElements.get(nodeName);
-            treeNodeElement.setAccumulation0(fieldName);
+    public void setAllField(Set<Field> accumulationSet, Set<Field> divisibleSet) {
+        if (!getStructureState()) {
+            throw new IllegalStateException("Not allowed before the method work() before!");
         }
-    }
-
-    @Override
-    public int getAccumulation(String uniqueNodeName, String uniqueFieldName) {
-        TreeNodeElement treeElement = getTreeElement(uniqueNodeName);
-        if(treeElement==null){
-            throw new IllegalArgumentException("No Tree Node named "+uniqueNodeName);
-        }else{
-            return treeElement.getAccumulation0(uniqueFieldName);
-        }
-    }
-
-    @Override
-    public void increment(String nodeName, String fieldName) {
-        TreeNodeElement treeElement = getTreeElement(nodeName);
-        if(treeElement==null){
-            throw new IllegalArgumentException("No Tree Node named "+nodeName);
-        }else{
-            List<TreeNodeElement> chain = treeElement.getChain();
-            for(TreeNodeElement temp : chain){
-                temp.increment0(fieldName,1);
-            }
-        }
-    }
-    @Override
-    public void increment(String nodeName, String fieldName,int number) {
-        if(number <= 0){
-            throw new IllegalArgumentException("number must > 0");
-        }else{
-            TreeNodeElement treeElement = getTreeElement(nodeName);
-            if(treeElement==null){
-                throw new IllegalArgumentException("No Tree Node named "+nodeName);
-            }else{
-                List<TreeNodeElement> chain = treeElement.getChain();
-                for(TreeNodeElement temp : chain){
-                    temp.increment0(fieldName,number);
-                }
+        synchronized (this) {
+            Map<String, ITreeElement> elements = getTreeElements();
+            for (String identifier : elements.keySet()) {
+                elements.get(identifier).init(accumulationSet, divisibleSet);
             }
         }
     }
 
-
-
+    @Override
+    public void increment(String nodeIdentifier, Field field) {
+        increment(nodeIdentifier, field, 1);
+    }
 
     @Override
-    public void setDivisible(String fieldName, double value) {
-        Set<String> nodeNames = treeNodeElements.keySet();
-        TreeNodeElement treeNodeElement = null;
-        for(String nodeName : nodeNames){
-            treeNodeElement = treeNodeElements.get(nodeName);
-            treeNodeElement.setDivisible0(fieldName,value);
+    public void increment(String nodeIdentifier, Field field, int number) {
+        ITreeElement treeElement = getTreeElement(nodeIdentifier);
+        if(treeElement==null){
+            throw new IllegalArgumentException("No Tree Node named " + nodeIdentifier);
+        }else{
+            List<ITreeElement> pathElements = treeElement.getPathElements();
+            for (ITreeElement temp : pathElements) {
+                temp.increment(field, number);
+            }
         }
     }
 
     @Override
-    public double getDivisible(String nodeName, String fieldName) {
-        TreeNodeElement treeElement = getTreeElement(nodeName);
-        if(treeElement==null){
-            throw new IllegalArgumentException("No Tree Node named "+nodeName);
+    public void setDivisible(String nodeIdentifier, Field field, int value) {
+        ITreeElement treeElement = getTreeElement(nodeIdentifier);
+        if (treeElement == null) {
+            throw new IllegalArgumentException("No Tree Node named " + nodeIdentifier);
         }else{
-           return treeElement.getDivisible0(fieldName);
+            treeElement.update(field, value);
+        }
+    }
+
+    @Override
+    public void backupAll() {
+        LinkedHashMap<String, ITreeElement> elements = getTreeElements();
+        ITreeElement temp;
+        for (String identifier : elements.keySet()) {
+            temp = elements.get(identifier);
+            temp.backup();
         }
     }
 
     @Override
     public History getHistory(String nodeName) {
-        TreeNodeElement treeElement = getTreeElement(nodeName);
+        ITreeElement treeElement = getTreeElement(nodeName);
         if(treeElement==null){
             throw new IllegalArgumentException("No Tree Node named "+nodeName);
         }else{
-            return treeElement.history;
+            return treeElement.getHistory();
         }
     }
 
     @Override
-    public  List<Integer> getAccumulationHistory(String nodeName, String fieldName) {
-        History history = getHistory(nodeName);
-        IntegerLimitQueue quene = history.getAccumulationQueue(fieldName);
-        List<Integer> result = new ArrayList<>();
-        result.addAll(quene);
-        return result;
+    public int getHistorySize() {
+        return history.getSize();
     }
 
     @Override
-    public List<Double> getDivisibleHistory(String nodeName, String fieldName) {
-        History history = getHistory(nodeName);
-        DoubleLimitQueue quene = history.getDivisibleQueue(fieldName);
-        List<Double> result =  new ArrayList<>();
-        result.addAll(quene);
-        return result;
+    public int getHistoryScale() {
+        return history.getScale();
     }
 
     @Override
-    public List<Double> getAverageAccumulationHistory(String nodeName, String fieldName) {
-        History history = getHistory(nodeName);
-        DoubleLimitQueue quene = history.getAccumulationAverageQueue(fieldName);
-        List<Double> result = new ArrayList<>();
-        result.addAll(quene);
-        return result;
-    }
-
-    @Override
-    public List<Double> getAverageDivisibleHistory(String nodeName, String fieldName) {
-        History history = getHistory(nodeName);
-        DoubleLimitQueue quene = history.getDivisibleAverageQueue(fieldName);
-        List<Double> result = new ArrayList<>();
-        result.addAll(quene);
-        return result;
-    }
-
-    final void put(String name, TreeNodeElement node){
-        ITreeElement innnerNode = treeNodeElements.get(name);
-        if(innnerNode == null){
-            treeNodeElements.put(name,node);
-        }else{
-            throw new IllegalArgumentException("Tree Inner node unique name repeat!please rename TreeNode Name!");
+    public LinkedHashMap<ITreeElement, List<TimeSlotNumber>> getChildFieldAvgData(Field field) {
+        LinkedHashMap<ITreeElement, List<TimeSlotNumber>> result = null;
+        if (!getStructureState() || !getDataState()) {
+            throw new IllegalStateException();
         }
+        LinkedHashMap<String, ITreeElement> children = getLeafTreeElements();
+        if (children != null && children.size() != 0) {
+            result = new LinkedHashMap<>();
+            ITreeElement temp;
+            History tempHistory;
+            List<TimeSlotNumber> tempFieldAvgDataList;
+            for (String identifier : children.keySet()) {
+                temp = children.get(identifier);
+                tempHistory = temp.getHistory();
+                tempFieldAvgDataList = tempHistory.getFieldAvgData(field);
+                result.put(temp, tempFieldAvgDataList);
+            }
+        }
+        return result;
+    }
+
+    @Override
+    public LinkedHashMap<ITreeElement, List<TimestampNumber>> getChildFieldData(Field field) {
+        LinkedHashMap<ITreeElement, List<TimestampNumber>> result = null;
+        if (!getStructureState() || !getDataState()) {
+            throw new IllegalStateException();
+        }
+        LinkedHashMap<String, ITreeElement> children = getLeafTreeElements();
+        if (children != null && children.size() != 0) {
+            result = new LinkedHashMap<>();
+            ITreeElement temp;
+            for (String identifier : children.keySet()) {
+                temp = children.get(identifier);
+                result.put(temp, temp.getHistory().getFieldData(field));
+            }
+        }
+        return result;
     }
 }

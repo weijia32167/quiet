@@ -268,7 +268,9 @@ public abstract class AbsService extends DefaultLifeCycle implements IService {
         return export;
     }
 
-    /********************Inner Help Util for transfer Throwable to ServiceException*********************************/
+    /********************
+     * Inner Help UnsafeUtil for transfer Throwable to ServiceException
+     *********************************/
     private ServiceException transferServiceException(Throwable e){
         ServiceException serviceException = null;
         if(e instanceof ServiceException){

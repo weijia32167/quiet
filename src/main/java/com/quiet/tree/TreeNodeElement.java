@@ -1,8 +1,12 @@
 package com.quiet.tree;
 
-import com.quiet.math.Arith;
+import com.quiet.collections.Sets;
 
+import java.lang.reflect.Field;
+import java.sql.Timestamp;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -11,28 +15,35 @@ import java.util.concurrent.atomic.AtomicInteger;
  * Date   : 2016/10/10
  * Desc   :
  */
-public class TreeNodeElement implements ITreeElement,Comparable<ITreeElement> {
+public class TreeNodeElement implements ITreeElement {
 
-    private TreeNodeElement parent;
+/*    private ReadWriteLock lock = new ReentrantReadWriteLock();
+    private Lock readLock = lock.readLock();
+    private Lock writeLock = lock.writeLock();*/
 
-    private PriorityQueue<TreeNodeElement> childrens;
+    private AtomicBoolean structureState = new AtomicBoolean(false);
+    private AtomicBoolean dataState = new AtomicBoolean(false);
 
-    private int priority = 0;
+    private ITreeElement parent;
 
-    private double ratio;
+    private Set<ITreeElement> children;
 
-    private String name;
+    private String identifier;
+
+    /*状态数据,用于累加记录状态的*/
+    protected Map<Field, AtomicInteger> accumulation;
 
     /*普通数据*/
-    protected Map<String,Double> divisible;
-    /*状态数据,用于累加记录状态的*/
-    protected Map<String,AtomicInteger> accumulation;
+    protected Map<Field, Number> divisible;
+
 
     protected History history;
 
-    TreeNodeElement(double ratio,String name) {
-        this.ratio = ratio;
-        this.name = name;
+    TreeNodeElement(String identifier, int size, int scale) {
+        this.identifier = identifier;
+        accumulation = new ConcurrentHashMap<>();
+        divisible = new ConcurrentHashMap<>();
+        history = new History(size, scale);
     }
 
     /*********************************Implements ITreeElement*****************************************/
@@ -48,16 +59,16 @@ public class TreeNodeElement implements ITreeElement,Comparable<ITreeElement> {
     }
 
     @Override
-    public PriorityQueue<TreeNodeElement> getChildren() {
-        if(childrens == null || childrens.size() == 0){
+    public Set<ITreeElement> getChildren() {
+        if (children == null || children.size() == 0) {
             return null;
         }else{
-            return childrens;
+            return children;
         }
     }
 
     @Override
-    public TreeNodeElement getParent() {
+    public ITreeElement getParent() {
         if(parent == null){
             return null;
         }else{
@@ -66,15 +77,15 @@ public class TreeNodeElement implements ITreeElement,Comparable<ITreeElement> {
     }
 
     @Override
-    public TreeRootElement getRoot() {
+    public ITreeRoot getRoot() {
         ElementType elementType = getType();
         if(elementType == ElementType.ROOT || elementType == ElementType.ROOT_LEAF){
-            return (TreeRootElement) this;
+            return (ITreeRoot) this;
         }else{
             ITreeElement parent = getParent();
             while(true){
                 if(parent != null&&parent.getParent() == null) {
-                    return (TreeRootElement)parent;
+                    return (ITreeRoot) parent;
                 }else{
                     parent = parent.getParent();
                 }
@@ -82,24 +93,6 @@ public class TreeNodeElement implements ITreeElement,Comparable<ITreeElement> {
         }
     }
 
-    @Override
-    public ElementType getType() {
-        ElementType result = null;
-        if(this.getParent() == null && this.getChildren() == null){
-            result = ElementType.ROOT_LEAF;
-        }
-        if(this.getParent() == null && this.getChildren() != null){
-            result = ElementType.ROOT;
-        }
-        if(this.getParent() != null && this.getChildren() == null){
-            result = ElementType.LEAF;
-        }
-        if(this.getParent() != null && this.getChildren() != null){
-            result = ElementType.NOROOT_NOLEAF;
-        }
-        assert result!=null;
-        return result;
-    }
 
     @Override
     public boolean isLeaf() {
@@ -113,47 +106,13 @@ public class TreeNodeElement implements ITreeElement,Comparable<ITreeElement> {
         return result == ElementType.ROOT_LEAF || result == ElementType.ROOT;
     }
 
-    @Override
-    public int getPriority() {
-        return priority;
-    }
-
-    @Override
-    public double getRatio() {
-        return ratio;
-    }
-
-    private TreeNodeElement child(ITreeElement child) {
-        double accruedRatio = getChildrenAccruedRatio();
-        double flag = Arith.add(accruedRatio,child.getRatio());
-        if(flag <= 1.0d){
-            if(childrens == null){
-                childrens = new PriorityQueue<>();
-            }
-            TreeNodeElement child0 = (TreeNodeElement)child;
-            child0.setParent(this);
-            child0.setPriority();
-            child0.history = new History(this.getRoot().history.getSize(),this.getRoot().history.getAverageSize());
-            this.getRoot().put(child.getUniqueName(),child0);
-            childrens.offer(child0);
-            return this;
-        }else{
-            throw new IllegalArgumentException("Childrens ratio > 1.0 is not allow!");
-        }
-    }
 
 
     @Override
-    public TreeNodeElement child(double ratio,String nodeName) {
-        ITreeElement treeElement = new TreeNodeElement(ratio,nodeName);
-        return child(treeElement);
-    }
-
-    @Override
-    public List<TreeNodeElement> getChain() {
-        List<TreeNodeElement> chain = new ArrayList<>();
+    public List<ITreeElement> getPathElements() {
+        List<ITreeElement> chain = new ArrayList<>();
         chain.add(this);
-        TreeNodeElement temp = parent;
+        ITreeElement temp = parent;
         while(true) {
             if (temp != null) {
                 chain.add(temp);
@@ -165,181 +124,139 @@ public class TreeNodeElement implements ITreeElement,Comparable<ITreeElement> {
     }
 
     @Override
-    public String getUniqueName() {
-        return name;
+    public String getIdentifier() {
+        return identifier;
     }
 
 
+    /**
+     * 1.check identifier repeat;
+     * 2.check TreeNode state;
+     * 3.construct and add child element.
+     */
 
- /*   final void _backup() {
-        history.backupDivisible(divisible);
-        history.backupAccumulation(accumulation);
-        clear();
-    }*/
-
-   private final void clear(){
-       /* if(divisible!=null){
-            Set<String> divisibleFieldNames = divisible.keySet();
-            for(String divisibleFieldName : divisibleFieldNames){
-                setDivisible0(divisibleFieldName,0);
-            }
-        }*/
-        if(accumulation!=null){
-            Set<String> accumulationFieldNames = accumulation.keySet();
-            for(String accumulationFieldName : accumulationFieldNames){
-                accumulation.get(accumulationFieldName).set(0);
-            }
-        }
-    }
-
-    /*********************Implements Comparable******************/
     @Override
-    public int compareTo(ITreeElement target) {
-        if( this.getRoot() == this.getRoot() && this.getDepth() == target.getDepth() ){
-            return this.priority - target.getPriority();
+    public ITreeElement child(String identifier) {
+        checkIdentifier(identifier);
+        if (structureState.get()) {
+            throw new IllegalStateException("TreeNodeElement has working![Function child() is not allow access if state is true]");
         }
-        throw new IllegalStateException("Not same root or not same depth!");
+        ITreeElement treeElement = new TreeNodeElement(identifier, getRoot().getHistorySize(), getRoot().getHistoryScale());
+        if (children == null) {
+            children = new LinkedHashSet<>();
+        }
+        ((TreeNodeElement) treeElement).parent = this;
+        children.add(treeElement);
+        ((TreeRootElement) this.getRoot()).treeNodeElements.put(identifier, treeElement);
+        return treeElement;
     }
 
-    /***********************Help Function********************************************/
-    private final void setParent(TreeNodeElement parent) {
-        if(this.parent != null){
-            throw new IllegalStateException("You can't invoke function setParent()!");
+    /**
+     * Check whether identifier repeat from All Tree elements.
+     * if identifier repeat,throw java.lang.IllegalArgumentException;
+     */
+    private void checkIdentifier(String identifier) {
+        ITreeRoot root = getRoot();
+        if (root.getTreeElement(identifier) != null) {
+            throw new IllegalArgumentException("Tree element identifier repeat!");
         }
-        this.parent = parent;
     }
 
-    private final void setPriority() {
-        ITreeElement parent = getParent();
-        if(parent.getChildren() == null){
-            priority = 1;
+
+    protected final boolean getStructureState() {
+        return structureState.get();
+    }
+
+    protected final boolean getDataState() {
+        return dataState.get();
+    }
+
+    @Override
+    public void work() {
+        structureState.compareAndSet(false, true);
+    }
+
+    @Override
+    public void init(Set<Field> accumulationSet, Set<Field> divisibleSet) {
+        if (Sets.intersection(accumulationSet, divisibleSet).size() != 0) {
+            throw new IllegalArgumentException("Tree element repeat Data Field!");
         }else{
-            int size = parent.getChildren().size();
-            priority = size+1;
-        }
-    }
-
-    private double getChildrenAccruedRatio(){
-        double result = 0.0d;
-        PriorityQueue<TreeNodeElement> childresns = getChildren();
-        if(childresns != null){
-            for(ITreeElement element : childresns){
-                result = Arith.add(result,element.getRatio());
+            for (Field field : accumulationSet) {
+                accumulation.put(field, new AtomicInteger());
+            }
+            for (Field field : divisibleSet) {
+                divisible.put(field, 0);
             }
         }
+        dataState.set(true);
+    }
+
+    private void checkDataState() {
+        if (!dataState.get()) {
+            throw new IllegalStateException("Tree Date has not inited!");
+        }
+    }
+
+    @Override
+    public void increment(Field field) {
+        checkDataState();
+        accumulation.get(field).incrementAndGet();
+    }
+
+    @Override
+    public void increment(Field field, int number) {
+        checkDataState();
+        accumulation.get(field).set(accumulation.get(field).get() + number);
+    }
+
+    @Override
+    public void update(Field field, Number number) {
+        checkDataState();
+        divisible.put(field, number);
+    }
+
+    @Override
+    public void backup() {
+        checkDataState();
+        Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+        for (Field field : accumulation.keySet()) {
+            AtomicInteger fieldCount = accumulation.get(field);
+            history.add(field, timestamp, fieldCount.get());
+            fieldCount.set(0);
+        }
+
+        for (Field field : divisible.keySet()) {
+            history.add(field, timestamp, divisible.get(field));
+        }
+    }
+
+    @Override
+    public History getHistory() {
+        checkDataState();
+        return history;
+    }
+
+    /***************************************************************************************************/
+    private final ElementType getType() {
+        ElementType result = null;
+        if (this.getParent() == null && this.getChildren() == null) {
+            result = ElementType.ROOT_LEAF;
+        }
+        if (this.getParent() == null && this.getChildren() != null) {
+            result = ElementType.ROOT;
+        }
+        if (this.getParent() != null && this.getChildren() == null) {
+            result = ElementType.LEAF;
+        }
+        if (this.getParent() != null && this.getChildren() != null) {
+            result = ElementType.NOROOT_NOLEAF;
+        }
+        assert result != null;
         return result;
     }
 
-    int increment0(String fieldName,int number){
-        if(this.accumulation == null){
-            throw new IllegalArgumentException("Accumulation Data named "+fieldName +" is't exists!");
-        }else{
-            AtomicInteger value = accumulation.get(fieldName);
-            if(value == null){
-                throw new IllegalArgumentException("Accumulation Data named "+fieldName +" is't exists!");
-            }else{
-                return value.addAndGet(number);
-            }
-        }
-    }
-
-
-    int getAccumulation0(String fieldName){
-       return _getAccumulation0(fieldName).intValue();
-    }
-
-   private AtomicInteger _getAccumulation0(String fieldName){
-        if(accumulation == null){
-            throw new IllegalArgumentException("Accumulation Data named "+fieldName +" is't exists!");
-        }else{
-            AtomicInteger value = accumulation.get(fieldName);
-            if(value == null){
-                throw new IllegalArgumentException("Accumulation Data named "+fieldName +" is't exists!");
-            }else{
-                return value;
-            }
-        }
-    }
-
-    void addAccumulationFiled0(String key, int initValue) {
-        if(accumulation == null){
-            accumulation = new LinkedHashMap<>();
-        }
-        if(accumulation.get(key)!=null){
-            throw new IllegalArgumentException("key repeat,please rename key!");
-        }else{
-            accumulation.put(key,new AtomicInteger(initValue));
-        }
-    }
-
-
-
-    void setDivisible0(String fieldName, double value) {
-        if(this.divisible == null){
-            this.divisible = new LinkedHashMap<>();
-        }
-        if(this.divisible.get(fieldName)==null){
-            addDivisibleFiled0(fieldName,value);
-        }
-        List<TreeNodeElement> chain = getChain();
-        double ratio =1.0;
-        for(TreeNodeElement treeNodeElement : chain){
-            ratio=Arith.mul(ratio,treeNodeElement.getRatio());
-        }
-        value = Arith.mul(value,ratio);
-        this.divisible.put(fieldName,value);
-        this.history.backupDivisible(fieldName,value);
-    }
-
-    void setAccumulation0(String fieldName) {
-        if(this.accumulation == null){
-            this.accumulation = new LinkedHashMap<>();
-        }
-        if(this.accumulation.get(fieldName)==null){
-            addAccumulationFiled0(fieldName,0);
-        }
-        AtomicInteger number = this.accumulation.get(fieldName);
-        int current = number.get();
-        number.set(0);
-        this.history.backupAccumulation(fieldName,current);
-    }
-
-
-
-    void addDivisibleFiled0(String fieldName, double initValue) {
-        if(this.divisible == null){
-            this.divisible = new LinkedHashMap<>();
-        }
-        if(this.divisible.get(fieldName)!=null){
-            throw new IllegalArgumentException("FieldName repeat,please rename fieldName!");
-        }else{
-            this.divisible.put(fieldName,Arith.mul(initValue,ratio));
-        }
-    }
-
-
-    double getDivisible0(String fieldName) {
-         if(this.divisible == null){
-             throw new IllegalArgumentException("FieldName named "+ fieldName +" is't exist!");
-         }else{
-             if(this.divisible.get(fieldName)==null){
-                 throw new IllegalArgumentException("FieldName named "+ fieldName +" is't exist!");
-             }else{
-                 return divisible.get(fieldName);
-             }
-         }
-     }
-
-
     @Override
     public String toString() {
-        final StringBuffer sb = new StringBuffer("TreeNodeElement{");
-        sb.append("name='").append(name).append('\'');
-        sb.append(", priority=").append(priority);
-        sb.append(", divisible=").append(divisible);
-        sb.append(", accumulation=").append(accumulation);
-        sb.append(", history=").append(history);
-        sb.append('}');
-        return sb.toString();
+        return identifier;
     }
 }
