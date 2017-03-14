@@ -13,9 +13,9 @@ import org.slf4j.LoggerFactory;
 import sun.misc.Unsafe;
 
 
-public final class UnsafeUtil {
+public final class UnSafeUtil {
 
-    public static final Logger LOGGER = LoggerFactory.getLogger(UnsafeUtil.class);
+    public static final Logger LOGGER = LoggerFactory.getLogger(UnSafeUtil.class);
 
     private static final Unsafe THE_UNSAFE;
     private static final int OBJECT_REF_SIZE;
@@ -180,8 +180,8 @@ public final class UnsafeUtil {
     }
 
     public static final byte[][] getBytes(Object object) {
-        long address = UnsafeUtil.address(object);
-        long size = UnsafeUtil.shallowSizeof(object);
+        long address = UnSafeUtil.address(object);
+        long size = UnSafeUtil.shallowSizeof(object);
         long offset = size % 8 == 0 ? size / 8 : (size / 8) + 1;
         if (offset <= 0) {
             throw new IllegalArgumentException("offset must > 0!");

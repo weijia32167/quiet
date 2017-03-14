@@ -32,35 +32,35 @@ public class UnsafeUtilTest {
         sequences[1] = sequence2;
         sequences[2] = obj1;
         sequences[3] = obj2;
-      /*  System.out.println("JVM地址大小:"+UnsafeUtil.addressOf(sequences[0] ));
-        System.out.println("JVM地址大小:"+UnsafeUtil.addressOf(sequences[1]));
-        System.out.println("JVM地址大小:"+UnsafeUtil.addressOf(sequences[2] ));
-        System.out.println("JVM地址大小:"+UnsafeUtil.addressOf(sequences[3]));
-        System.out.println(UnsafeUtil.getUnsafe().objectFieldOffset(Sequence.class.getField("value")));*/
-      /*  System.out.println(UnsafeUtil.getAddressSize());
-        System.out.println(UnsafeUtil.getObjectRefSize());*/
-       /* System.out.println(UnsafeUtil.getObjectHeaderSize());*/
-       /* System.out.println(UnsafeUtil.sizeOf(sequences,false));*/
-        /*System.out.println(UnsafeUtil.getStartAddress(sequence1));
-        System.out.println(UnsafeUtil.getStartAddress(sequence2));*/
-        long address = UnsafeUtil.address(sequences);
+      /*  System.out.println("JVM地址大小:"+UnSafeUtil.addressOf(sequences[0] ));
+        System.out.println("JVM地址大小:"+UnSafeUtil.addressOf(sequences[1]));
+        System.out.println("JVM地址大小:"+UnSafeUtil.addressOf(sequences[2] ));
+        System.out.println("JVM地址大小:"+UnSafeUtil.addressOf(sequences[3]));
+        System.out.println(UnSafeUtil.getUnsafe().objectFieldOffset(Sequence.class.getField("value")));*/
+      /*  System.out.println(UnSafeUtil.getAddressSize());
+        System.out.println(UnSafeUtil.getObjectRefSize());*/
+       /* System.out.println(UnSafeUtil.getObjectHeaderSize());*/
+       /* System.out.println(UnSafeUtil.sizeOf(sequences,false));*/
+        /*System.out.println(UnSafeUtil.getStartAddress(sequence1));
+        System.out.println(UnSafeUtil.getStartAddress(sequence2));*/
+        long address = UnSafeUtil.address(sequences);
         System.out.println(Long.toHexString(address));
-        long a0 = UnsafeUtil.getUnsafe().getLong(address);
-        long a1 = UnsafeUtil.getUnsafe().getLong(address + 8);
+        long a0 = UnSafeUtil.getUnsafe().getLong(address);
+        long a1 = UnSafeUtil.getUnsafe().getLong(address + 8);
         System.out.println(Long.toHexString(a0));
         System.out.println(Long.toHexString(a1));
-        /* System.out.println("对象大小:"+UnsafeUtil.sizeOf(paddingLong1));*/
+        /* System.out.println("对象大小:"+UnSafeUtil.sizeOf(paddingLong1));*/
        /*  PaddingLong paddingLong1 = new PaddingLong();
-        System.out.println("JVM地址大小:"+UnsafeUtil.getUnsafe().addressSize() );   //地址大小会决定对象头的大小
-        System.out.println("JVM引用大小:"+UnsafeUtil.getObjectRefSize() );          //引用大小
-        System.out.println("对象大小:"+UnsafeUtil.sizeOf(new LhsPadding()));
-        System.out.println("对象大小:"+UnsafeUtil.sizeOf(new Value()));
-        System.out.println("对象大小:"+UnsafeUtil.sizeOf(new RhsPadding()));
-        System.out.println("对象大小:"+UnsafeUtil.sizeOf(new Sequence()));
-        System.out.println("对象大小:"+UnsafeUtil.sizeOf(paddingLong));
-        System.out.println("对象地址:"+UnsafeUtil.addressOf(sequences));
-        System.out.println("对象地址:"+UnsafeUtil.addressOf(paddingLong));
-        System.out.println("对象地址:"+UnsafeUtil.addressOf(paddingLong1));*/
+        System.out.println("JVM地址大小:"+UnSafeUtil.getUnsafe().addressSize() );   //地址大小会决定对象头的大小
+        System.out.println("JVM引用大小:"+UnSafeUtil.getObjectRefSize() );          //引用大小
+        System.out.println("对象大小:"+UnSafeUtil.sizeOf(new LhsPadding()));
+        System.out.println("对象大小:"+UnSafeUtil.sizeOf(new Value()));
+        System.out.println("对象大小:"+UnSafeUtil.sizeOf(new RhsPadding()));
+        System.out.println("对象大小:"+UnSafeUtil.sizeOf(new Sequence()));
+        System.out.println("对象大小:"+UnSafeUtil.sizeOf(paddingLong));
+        System.out.println("对象地址:"+UnSafeUtil.addressOf(sequences));
+        System.out.println("对象地址:"+UnSafeUtil.addressOf(paddingLong));
+        System.out.println("对象地址:"+UnSafeUtil.addressOf(paddingLong1));*/
     /*   final ClassIntrospector ci = new ClassIntrospector();
         ObjectInfo res;
         res = ci.introspect(new ObjectA());
@@ -77,12 +77,12 @@ public class UnsafeUtilTest {
         sequences[0] = sequence1;
         sequences[1] = sequence2;
         sequences[2] = sequence3;
-        long sequencesAddress = UnsafeUtil.address(sequences);
-        long klass = UnsafeUtil.getUnsafe().getLong(sequencesAddress + 8);
+        long sequencesAddress = UnSafeUtil.address(sequences);
+        long klass = UnSafeUtil.getUnsafe().getLong(sequencesAddress + 8);
      /*   LOGGER.info("start address: "+Long.toHexString(sequencesAddress)+"");
         LOGGER.info("klass value: "+Long.toHexString(klass)+"");*/
         int i = 1;
-        LOGGER.info("array size: " + UnsafeUtil.shallowSizeof(sequences));
+        LOGGER.info("array size: " + UnSafeUtil.shallowSizeof(sequences));
     }
 
 
@@ -92,8 +92,8 @@ public class UnsafeUtilTest {
         sequences[0] = new Sequence(1);
         ArrayQueue queue = new ArrayQueue(8);
 
-        long address = UnsafeUtil.address(Thread.currentThread());
-        byte[][] result = UnsafeUtil.getBytes(Thread.currentThread());
+        long address = UnSafeUtil.address(Thread.currentThread());
+        byte[][] result = UnSafeUtil.getBytes(Thread.currentThread());
 
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append(System.getProperty("line.separator"));
@@ -104,9 +104,9 @@ public class UnsafeUtilTest {
             }
             stringBuilder.append(System.getProperty("line.separator"));
         }
-        LOGGER.info("address size: " + UnsafeUtil.getAddressSize());
-        LOGGER.info("header size: " + UnsafeUtil.getObjectHeaderSize());
-        LOGGER.info("size: " + UnsafeUtil.shallowSizeof(Thread.currentThread()));
+        LOGGER.info("address size: " + UnSafeUtil.getAddressSize());
+        LOGGER.info("header size: " + UnSafeUtil.getObjectHeaderSize());
+        LOGGER.info("size: " + UnSafeUtil.shallowSizeof(Thread.currentThread()));
         LOGGER.info(stringBuilder.toString());
     }
 
@@ -114,7 +114,7 @@ public class UnsafeUtilTest {
     private static final int BUFFER_PAD;   //32
     private static long REF_ARRAY_BASE; //144
     private static final int REF_ELEMENT_SHIFT;  //2
-    private static final Unsafe UNSAFE = UnsafeUtil.getUnsafe();
+    private static final Unsafe UNSAFE = UnSafeUtil.getUnsafe();
 
     static {
         final int scale = UNSAFE.arrayIndexScale(Object[].class);

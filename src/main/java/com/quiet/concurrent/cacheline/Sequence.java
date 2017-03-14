@@ -1,6 +1,6 @@
 package com.quiet.concurrent.cacheline;
 
-import com.quiet.util.UnsafeUtil;
+import com.quiet.util.UnSafeUtil;
 import sun.misc.Unsafe;
 
 /**
@@ -17,7 +17,7 @@ public class Sequence extends RhsPadding {
     private static final long VALUE_OFFSET;
 
     static {
-        UNSAFE = UnsafeUtil.getUnsafe();
+        UNSAFE = UnSafeUtil.getUnsafe();
         try {
             VALUE_OFFSET = UNSAFE.objectFieldOffset(Value.class.getDeclaredField("value"));
         } catch (final Exception e) {

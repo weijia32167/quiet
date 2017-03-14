@@ -70,8 +70,8 @@ public class ClassIntrospector {
         int baseOffset = 0;
         int indexScale = 0;
         if (type.isArray() && obj != null) {
-            baseOffset = UnsafeUtil.getUnsafe().arrayBaseOffset(type);
-            indexScale = UnsafeUtil.getUnsafe().arrayIndexScale(type);
+            baseOffset = UnSafeUtil.getUnsafe().arrayBaseOffset(type);
+            indexScale = UnSafeUtil.getUnsafe().arrayIndexScale(type);
             arraySize = baseOffset + indexScale * Array.getLength(obj);
         }
 
@@ -81,7 +81,7 @@ public class ClassIntrospector {
                     type), 0, getShallowSize(type), arraySize, baseOffset,
                     indexScale);
         } else {
-            final int offset = (int) UnsafeUtil.getUnsafe().objectFieldOffset(fld);
+            final int offset = (int) UnSafeUtil.getUnsafe().objectFieldOffset(fld);
             root = new ObjectInfo(fld.getName(), type.getCanonicalName(),
                     getContents(obj, type), offset, getShallowSize(type),
                     arraySize, baseOffset, indexScale);
@@ -171,6 +171,6 @@ public class ClassIntrospector {
             final Integer res = primitiveSizes.get(type);
             return res != null ? res : 0;
         } else
-            return UnsafeUtil.getObjectRefSize();
+            return UnSafeUtil.getObjectRefSize();
     }
 }
