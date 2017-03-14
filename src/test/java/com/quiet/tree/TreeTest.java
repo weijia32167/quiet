@@ -104,7 +104,7 @@ public class TreeTest {
 
         Map<Integer, List<TimeSlotNumber>> result = new LinkedHashMap<>();
         for (int i = 0; i < childrenTimeSlotNumbers.iterator().next().size(); i++) {
-            result.put(i, new ArrayList<>());
+            result.put(i, new ArrayList<TimeSlotNumber>());
         }
         for (List<TimeSlotNumber> list : childrenTimeSlotNumbers) {
             for (int i = 0; i < list.size(); i++) {
