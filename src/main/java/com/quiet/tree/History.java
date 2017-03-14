@@ -18,15 +18,17 @@ import java.util.Map;
  * Desc   :
  */
 public final class History {
-    /*字段历史数据*/
+    /**
+     * 字段历史数据
+     **/
     private final Map<Field, NumberProxyRingBuffer<TimestampNumber>> fieldHistory;
-    /*字段历史数据均值*/
+    /**字段历史数据均值**/
     private final Map<Field, NumberProxyRingBuffer<TimeSlotNumber>> fieldAvgHistory;
 
     private final int size;
 
     private final int avgSize;
-    /*均值的精确度*/
+    /**均值的精确度**/
     private final int scale;
 
     public History(int size, int scale) {
