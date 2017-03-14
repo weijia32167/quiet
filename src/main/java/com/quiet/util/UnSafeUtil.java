@@ -7,6 +7,7 @@ import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.security.AccessController;
 import java.security.PrivilegedExceptionAction;
+import java.util.Comparator;
 import java.util.TreeSet;
 
 import org.slf4j.Logger;
@@ -222,12 +223,19 @@ public final class UnsafeUtil {
                 }
             }
         } else {
-            TreeSet<Field> fields = new TreeSet<>((o1, o2) -> {
-                return (int) (THE_UNSAFE.objectFieldOffset(o1) - THE_UNSAFE.objectFieldOffset(o2));
+
+            TreeSet<Field> fields = new TreeSet<>(new Comparator<Field>() {
+                @Override
+                public int compare(Field o1, Field o2) {
+                    return (int) (THE_UNSAFE.objectFieldOffset(o1) - THE_UNSAFE.objectFieldOffset(o2));
+                }
             });
 
-            TreeSet<Field> referenceFields = new TreeSet<>((o1, o2) -> {
-                return (int) (THE_UNSAFE.objectFieldOffset(o1) - THE_UNSAFE.objectFieldOffset(o2));
+            TreeSet<Field> referenceFields = new TreeSet<>(new Comparator<Field>() {
+                @Override
+                public int compare(Field o1, Field o2) {
+                    return (int) (THE_UNSAFE.objectFieldOffset(o1) - THE_UNSAFE.objectFieldOffset(o2));
+                }
             });
 
             while (clazz != Object.class) {
