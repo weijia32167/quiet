@@ -18,7 +18,19 @@ public class StateEvent<Source,State> extends EventObject{
 
     protected State newState;
 
-    public StateEvent(Source source,State oldState) {
+    public State getOldState() {
+        return oldState;
+    }
+
+    public State getNewState() {
+        return newState;
+    }
+
+    public long getTime() {
+        return time;
+    }
+
+    public StateEvent(Source source, State oldState) {
         super(source);
         this.oldState = oldState;
     }
