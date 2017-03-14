@@ -21,7 +21,9 @@ public final class UnsafeUtil {
 
     private static final Unsafe THE_UNSAFE;
     private static final int OBJECT_REF_SIZE;
-    /*JVM地址长度: 32bit 64bit*/
+    /**
+     * JVM指针长度: 32bit 64bit
+     **/
     private static final int ADDRESS_SIZE;
 
     private static final long OBJECT_ARRAY_BASE_ADDRESS;
