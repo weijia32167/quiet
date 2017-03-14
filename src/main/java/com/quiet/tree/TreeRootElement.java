@@ -5,6 +5,7 @@ import com.quiet.data.TimestampNumber;
 
 import java.lang.reflect.Field;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Copyright tv.sohu.com
@@ -120,6 +121,21 @@ public class TreeRootElement extends TreeNodeElement implements ITreeRoot {
     @Override
     public int getHistoryScale() {
         return history.getScale();
+    }
+
+
+    @Override
+    public AtomicInteger getAccumulationFieldValue(String nodeIdentifier, Field field) {
+        checkDataState();
+        ITreeElement element = getTreeElement(nodeIdentifier);
+        return element.getAccumulationFieldValue(field);
+    }
+
+    @Override
+    public Number getDivisibleFieldValue(String nodeIdentifier, Field field) {
+        checkDataState();
+        ITreeElement element = getTreeElement(nodeIdentifier);
+        return element.getDivisibleFieldValue(field);
     }
 
     @Override

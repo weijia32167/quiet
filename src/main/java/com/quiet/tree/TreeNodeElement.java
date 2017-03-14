@@ -191,7 +191,7 @@ public class TreeNodeElement implements ITreeElement {
         dataState.set(true);
     }
 
-    private void checkDataState() {
+    protected void checkDataState() {
         if (!dataState.get()) {
             throw new IllegalStateException("Tree Date has not inited!");
         }
@@ -234,6 +234,25 @@ public class TreeNodeElement implements ITreeElement {
     public History getHistory() {
         checkDataState();
         return history;
+    }
+
+    /**************************************************************************************************/
+    public AtomicInteger getAccumulationFieldValue(Field field) {
+        checkDataState();
+        if (accumulation.containsKey(field)) {
+            return accumulation.get(field);
+        } else {
+            throw new IllegalArgumentException();
+        }
+    }
+
+    public Number getDivisibleFieldValue(Field field) {
+        checkDataState();
+        if (divisible.containsKey(field)) {
+            return divisible.get(field);
+        } else {
+            throw new IllegalArgumentException();
+        }
     }
 
     /***************************************************************************************************/

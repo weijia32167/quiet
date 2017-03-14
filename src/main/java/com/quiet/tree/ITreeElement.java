@@ -3,6 +3,7 @@ package com.quiet.tree;
 import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Copyright tv.sohu.com
@@ -64,7 +65,7 @@ public interface ITreeElement {
 
     /***********************************
      * Write tree element date
-     *******************************************************/
+     **********************************/
 
     void init(Set<Field> accumulationSet, Set<Field> divisibleSet);
 
@@ -78,5 +79,11 @@ public interface ITreeElement {
 
     History getHistory();
 
+    /***********************************
+     * Read tree element date
+     **********************************/
+    public AtomicInteger getAccumulationFieldValue(Field field);
+
+    public Number getDivisibleFieldValue(Field field);
 
 }

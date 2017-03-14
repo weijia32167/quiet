@@ -9,6 +9,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Copyright tv.sohu.com
@@ -57,6 +58,10 @@ public interface ITreeRoot extends ITreeElement {
 
     /*设置普通数值字段*/
     void setDivisible(String nodeIdentifier, Field field, int value);
+
+    public AtomicInteger getAccumulationFieldValue(String nodeIdentifier, Field field);
+
+    public Number getDivisibleFieldValue(String nodeIdentifier, Field field);
 
     void backupAll();
     /**********************************Tree Data 历史记录************************************************************************/
