@@ -2,7 +2,6 @@ package com.quiet.util;
 
 import com.quiet.concurrent.cacheline.Sequence;
 import com.sun.jmx.remote.internal.ArrayQueue;
-import org.apache.logging.log4j.util.StringBuilders;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
