@@ -1,7 +1,7 @@
 package com.quiet.collections;
 
+import com.quiet.collections.queue.NumberProxyRingBuffer;
 import com.quiet.collections.queue.NumberRingBuffer;
-import com.quiet.collections.queue.RingBuffer;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;

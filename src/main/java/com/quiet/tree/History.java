@@ -3,7 +3,7 @@ package com.quiet.tree;
 
 import com.quiet.data.TimeSlotNumber;
 import com.quiet.data.TimestampNumber;
-import com.quiet.collections.queue.NumberRingBuffer;
+import com.quiet.collections.queue.NumberProxyRingBuffer;
 
 import java.lang.reflect.Field;
 import java.sql.Timestamp;
@@ -19,9 +19,9 @@ import java.util.Map;
  */
 public final class History {
     /*字段历史数据*/
-    private final Map<Field, NumberRingBuffer<TimestampNumber>> fieldHistory;
+    private final Map<Field, NumberProxyRingBuffer<TimestampNumber>> fieldHistory;
     /*字段历史数据均值*/
-    private final Map<Field, NumberRingBuffer<TimeSlotNumber>> fieldAvgHistory;
+    private final Map<Field, NumberProxyRingBuffer<TimeSlotNumber>> fieldAvgHistory;
 
     private final int size;
 
@@ -52,12 +52,12 @@ public final class History {
     }
 
     public void add(Field field, Timestamp timestamp, Number value) {
-        NumberRingBuffer dataBuffer;
-        NumberRingBuffer dataAvgBuffer;
+        NumberProxyRingBuffer dataBuffer;
+        NumberProxyRingBuffer dataAvgBuffer;
         if (!fieldHistory.containsKey(field)) {
             assert !fieldAvgHistory.containsKey(field);
-            dataBuffer = new NumberRingBuffer<TimestampNumber>(size);
-            dataAvgBuffer = new NumberRingBuffer<TimeSlotNumber>(avgSize);
+            dataBuffer = new NumberProxyRingBuffer<TimestampNumber>(size);
+            dataAvgBuffer = new NumberProxyRingBuffer<TimeSlotNumber>(avgSize);
             synchronized (field) {
                 fieldHistory.put(field, dataBuffer);
                 fieldAvgHistory.put(field, dataAvgBuffer);
