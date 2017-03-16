@@ -35,7 +35,7 @@ public class LinearRegressionTest {
 
     @Test
     public void ridgeTest() {
-        Matrix x = LinearRegression.ridge(A, b, lambda);
+        Matrix x = LinearRegression.olsRidge(A, b, lambda);
         logger.info("Ridge result Matrix x:");
         x.print(10, 2);
     }

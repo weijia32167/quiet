@@ -84,7 +84,7 @@ public class TreeRootElement extends TreeNodeElement implements ITreeRoot {
     }
 
     @Override
-    public void setDivisible(String nodeIdentifier, Field field, int value) {
+    public void setDivisible(String nodeIdentifier, Field field, Number value) {
         ITreeElement treeElement = getTreeElement(nodeIdentifier);
         if (treeElement == null) {
             throw new IllegalArgumentException("No Tree Node named " + nodeIdentifier);
@@ -176,5 +176,21 @@ public class TreeRootElement extends TreeNodeElement implements ITreeRoot {
             }
         }
         return result;
+    }
+
+    @Override
+    public List<TimeSlotNumber> getRootFieldAvgData(Field field) {
+        if (!getStructureState() || !getDataState()) {
+            throw new IllegalStateException();
+        }
+        return this.getHistory().getFieldAvgData(field);
+    }
+
+    @Override
+    public List<TimestampNumber> getRootFieldData(Field field) {
+        if (!getStructureState() || !getDataState()) {
+            throw new IllegalStateException();
+        }
+        return this.getHistory().getFieldData(field);
     }
 }

@@ -57,7 +57,7 @@ public interface ITreeRoot extends ITreeElement {
     void increment(String nodeIdentifier, Field field, int number);
 
     /*设置普通数值字段*/
-    void setDivisible(String nodeIdentifier, Field field, int value);
+    void setDivisible(String nodeIdentifier, Field field, Number value);
 
     public AtomicInteger getAccumulationFieldValue(String nodeIdentifier, Field field);
 
@@ -75,5 +75,7 @@ public interface ITreeRoot extends ITreeElement {
 
     LinkedHashMap<ITreeElement, List<TimestampNumber>> getChildFieldData(Field field);
 
+    List<TimestampNumber> getRootFieldData(Field field);
 
+    List<TimeSlotNumber> getRootFieldAvgData(Field field);
 }

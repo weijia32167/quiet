@@ -1,5 +1,7 @@
 package com.quiet.tree;
 
+import com.quiet.data.TimestampNumber;
+
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -13,4 +15,5 @@ public class Node {
     private AtomicInteger pass;
     private AtomicInteger reject;
     private Number allow;
+    private Number bandWidthRate;
 }

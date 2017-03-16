@@ -1,8 +1,11 @@
 package com.quiet.tree;
 
 
+import Jama.Matrix;
 import com.quiet.data.TimeSlotNumber;
 import com.quiet.data.TimestampNumber;
+import com.quiet.math.LinearRegression;
+import org.apache.commons.lang3.StringUtils;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -37,6 +40,8 @@ public class TreeTest {
     private static Field passField;
     private static Field rejectField;
     private static Field allowField;
+    private static Field bandWidthRateField;
+
 
     @BeforeClass
     public static void init() throws Exception {
@@ -44,12 +49,14 @@ public class TreeTest {
         passField = Node.class.getDeclaredField("pass");
         rejectField = Node.class.getDeclaredField("reject");
         allowField = Node.class.getDeclaredField("allow");
+        bandWidthRateField = Node.class.getDeclaredField("bandWidthRate");
         accumulationSet = new LinkedHashSet<>();
         divisibleSet = new LinkedHashSet<>();
         accumulationSet.add(allocField);
         accumulationSet.add(passField);
         accumulationSet.add(rejectField);
         divisibleSet.add(allowField);
+        divisibleSet.add(bandWidthRateField);
     }
 
     @Test
@@ -81,23 +88,77 @@ public class TreeTest {
                 root.increment(temp, passField);
             }
             if (i % 10 == 0) {
+                root.setDivisible("root", bandWidthRateField, ThreadLocalRandom.current().nextInt(100));
                 root.backupAll();
             }
         }
         LinkedHashMap<ITreeElement, List<TimeSlotNumber>> childAllocFieldAvgData = root.getChildFieldAvgData(allocField);
         LinkedHashMap<ITreeElement, List<TimeSlotNumber>> childPassFieldAvgData = root.getChildFieldAvgData(passField);
         LinkedHashMap<ITreeElement, List<TimeSlotNumber>> childRejectFieldAvgData = root.getChildFieldAvgData(rejectField);
-        print(allocField, childAllocFieldAvgData);
+        List<TimestampNumber> bandWidthRateList = root.getRootFieldData(bandWidthRateField);
         print(passField, childPassFieldAvgData);
-        print(passField, childRejectFieldAvgData);
+        print(bandWidthRateField, bandWidthRateList);
+        ml(childPassFieldAvgData, bandWidthRateList);
+
+
+    }
+
+    private void ml(LinkedHashMap<ITreeElement, List<TimeSlotNumber>> childPassFieldAvgData, List<TimestampNumber> bandWidthRateList) {
+        Collection<List<TimeSlotNumber>> childrenTimeSlotNumbers = childPassFieldAvgData.values();
+        Map<Integer, List<TimeSlotNumber>> result = new LinkedHashMap<>();
+        for (int i = 0; i < childrenTimeSlotNumbers.iterator().next().size(); i++) {
+            result.put(i, new ArrayList<TimeSlotNumber>());
+        }
+        for (List<TimeSlotNumber> list : childrenTimeSlotNumbers) {
+            for (int i = 0; i < list.size(); i++) {
+                result.get(i).add(list.get(i));
+            }
+        }
+        double[][] AArray = new double[bandWidthRateList.size()][];
+        for (int i = bandWidthRateList.size() - 1; i >= 0; i--) {
+            List<TimeSlotNumber> list = result.get(i);
+            AArray[bandWidthRateList.size() - i - 1] = new double[bandWidthRateList.size()];
+            for (int j = 0; j < list.size(); j++) {
+                AArray[bandWidthRateList.size() - i - 1][j] = list.get(j).getNumber().doubleValue();
+            }
+        }
+
+        double[][] bArray = new double[bandWidthRateList.size()][1];
+        for (int i = bandWidthRateList.size() - 1; i >= 0; i--) {
+            bArray[bandWidthRateList.size() - 1 - i] = new double[1];
+            bArray[bandWidthRateList.size() - 1 - i][0] = bandWidthRateList.get(i).getNumber().doubleValue();
+        }
+        Matrix A = new Matrix(AArray);
+        Matrix b = new Matrix(bArray);
+        Matrix ols = LinearRegression.ols(A, b);
+        Matrix ridge = LinearRegression.olsRidge(A, b, 1.0d);
+        Matrix lwlr = LinearRegression.lwlrRidge(A, b, 10.0d, 100);
+
+     /*   A.print(10,2);
+        b.print(10,2);*/
+/*        ols.print(10,2);
+        ridge.print(10,2);*/
+        lwlr.print(10, 2);
+    }
+
+    public void print(Field field, List<TimestampNumber> bandWidthRates) {
+        StringBuffer sb = new StringBuffer();
+        sb.append(StringUtils.rightPad(field.getName(), _SIZE));
+        sb.append(lineSeparator);
+        for (int i = bandWidthRates.size() - 1; i >= 0; i--) {
+            sb.append(StringUtils.rightPad(bandWidthRates.get(i).getTimestamp() + "", _SIZE));
+            sb.append(StringUtils.rightPad(bandWidthRates.get(i).getNumber().toString(), SIZE));
+            sb.append(lineSeparator);
+        }
+        LOGGER.info(sb.toString());
     }
 
     public void print(Field field, LinkedHashMap<ITreeElement, List<TimeSlotNumber>> childFieldAvgData) {
         StringBuffer sb = new StringBuffer();
-        sb.append(_toSizeString(field.getName()));
+        sb.append(StringUtils.rightPad(field.getName(), _SIZE));
         for (ITreeElement treeElement : childFieldAvgData.keySet()) {
             String identifier = treeElement.getIdentifier();
-            sb.append(toSizeString(identifier));
+            sb.append(StringUtils.rightPad(identifier, SIZE));
         }
         sb.append(lineSeparator);
         Collection<List<TimeSlotNumber>> childrenTimeSlotNumbers = childFieldAvgData.values();
@@ -112,7 +173,7 @@ public class TreeTest {
             }
         }
 
-        for (int i = 0; i < result.size(); i++) {
+        for (int i = result.size() - 1; i >= 0; i--) {
             List<TimeSlotNumber> list = result.get(i);
             Timestamp start = new Timestamp(0);
             Timestamp end = new Timestamp(0);
@@ -121,30 +182,13 @@ public class TreeTest {
                     Assert.assertTrue(end.getTime() == 0);
                     start = list.get(j).getStart();
                     end = list.get(j).getEnd();
-                    sb.append(_toSizeString(start + "--" + end));
+                    sb.append(StringUtils.rightPad(start + "--" + end, _SIZE));
                 }
-                sb.append(toSizeString(list.get(j).getNumber().toString()));
+                sb.append(StringUtils.rightPad(list.get(j).getNumber().toString(), SIZE));
             }
             sb.append(lineSeparator);
         }
         LOGGER.info(sb.toString());
     }
 
-    public String _toSizeString(String string) {
-        StringBuffer sb = new StringBuffer(_SIZE);
-        sb.append(string);
-        for (int i = 0; i < _SIZE - string.length(); i++) {
-            sb.append(" ");
-        }
-        return sb.toString();
-    }
-
-    public String toSizeString(String string) {
-        StringBuffer sb = new StringBuffer(SIZE);
-        sb.append(string);
-        for (int i = 0; i < SIZE - string.length(); i++) {
-            sb.append(" ");
-        }
-        return sb.toString();
-    }
 }
