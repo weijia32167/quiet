@@ -1,5 +1,7 @@
 package com.quiet.chain.validate;
 
+import com.quiet.chain.validate.core.ValidateException;
+
 import java.util.regex.Pattern;
 
 /**
@@ -14,27 +16,27 @@ public abstract class RegularExpressionValidate extends NotNullValidate {
 
     private final Pattern pattern;
 
-    private final String ERROR_MESSAGE;
+    private final String ERROR;
 
     public RegularExpressionValidate(String name, String regularExpression) {
         super(name);
         this.regularExpression = regularExpression;
         this.pattern = Pattern.compile(regularExpression);
-        ERROR_MESSAGE = name + " " + Constant.ERROR_REGULAR_EXPRESSION + " " + regularExpression;
+        ERROR = name + " " + Constant.ERROR_REGULAR_EXPRESSION + " " + regularExpression;
     }
 
     public RegularExpressionValidate(String name, String regularExpression, String errorMessage) {
         super(name);
         this.regularExpression = regularExpression;
         this.pattern = Pattern.compile(regularExpression);
-        ERROR_MESSAGE = errorMessage;
+        ERROR = errorMessage;
     }
 
     @Override
     public void validate() throws ValidateException {
         super.validate();
         if (!pattern.matcher(name).matches()) {
-            ValidateException.throwException(ERROR_MESSAGE);
+            ValidateException.throwException(ERROR);
         }
     }
 }

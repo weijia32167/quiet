@@ -12,4 +12,7 @@ public class IPv4Validate extends RegularExpressionValidate {
         super(ipV4, Constant.IPV4, ipV4 + " " + Constant.ERROR_IPV4);
     }
 
+    public IPv4Validate(String ipV4, String errorMessageIfNotIPv4) {
+        super(ipV4, Constant.IPV4, errorMessageIfNotIPv4);
+    }
 }

@@ -1,4 +1,5 @@
-package com.quiet.chain.validate;
+package com.quiet.chain.validate.core;
+
 
 /**
  * Copyright tv.sohu.com
