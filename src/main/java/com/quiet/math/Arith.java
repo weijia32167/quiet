@@ -110,4 +110,16 @@ public final class Arith{
         return result.intValue();
     }
 
+    /**
+     * 比较两个Number之间的大小
+     * v1 > v2  return 1
+     * v1 < v2 return -1
+     * v1 = v2 return 0
+     */
+    public static int compare(Number v1, Number v2) {
+        BigDecimal b1 = new BigDecimal(v1.toString());
+        BigDecimal b2 = new BigDecimal(v2.toString());
+        return b1.compareTo(b2);
+    }
+
 }
