@@ -13,19 +13,19 @@ public class NotNullValidate extends AbsStringValidate {
 
     private final String ERROR;
 
-    public NotNullValidate(String name) {
-        super(name);
+    public NotNullValidate(String arg, String name) {
+        super(arg);
         ERROR = name + " " + Constant.ERROR_NULL;
     }
 
-    public NotNullValidate(String name, String errorMessageIfNull) {
-        super(name);
+    public NotNullValidate(String arg, String name, String errorMessageIfNull) {
+        super(arg);
         ERROR = errorMessageIfNull;
     }
 
     @Override
     public void validate() throws ValidateException {
-        if (name == null) {
+        if (arg == null) {
             ValidateException.throwException(ERROR);
         }
     }

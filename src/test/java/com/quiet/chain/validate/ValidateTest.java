@@ -13,8 +13,22 @@ public class ValidateTest {
 
     @Test
     public void stringToNumberValidate() throws ValidateException {
-        String a = "18";
-        StringNumberRangeValidate validate = new StringNumberRangeValidate(a, Float.class, 10, 20);
+        String a = "21";
+        StringNumberRangeValidate validate = new StringNumberRangeValidate(a, "a", Float.class, 10, 20);
+        validate.validate();
+    }
+
+    @Test
+    public void nullValidate() throws ValidateException {
+        String a = null;
+        NotNullValidate validate = new NotNullValidate(a, "a");
+        validate.validate();
+    }
+
+    @Test
+    public void ipv4Validate() throws ValidateException {
+        String ipV4 = "123";
+        IPv4Validate validate = new IPv4Validate(ipV4);
         validate.validate();
     }
 

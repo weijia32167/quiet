@@ -12,8 +12,8 @@ public class StringToNumberValidate extends NotNullValidate {
 
     protected final Class clazz;
 
-    public StringToNumberValidate(String name, Class clazz) {
-        super(name);
+    public StringToNumberValidate(String arg, String name, Class clazz) {
+        super(arg, name);
         this.clazz = clazz;
     }
 
@@ -23,22 +23,22 @@ public class StringToNumberValidate extends NotNullValidate {
         try {
             switch (className) {
                 case "java.lang.Byte":
-                    Byte.parseByte(name);
+                    Byte.parseByte(arg);
                     break;
                 case "java.lang.Integer":
-                    Integer.parseInt(name);
+                    Integer.parseInt(arg);
                     break;
                 case "java.lang.Short":
-                    Short.parseShort(name);
+                    Short.parseShort(arg);
                     break;
                 case "java.lang.Long":
-                    Long.parseLong(name);
+                    Long.parseLong(arg);
                     break;
                 case "java.lang.Float":
-                    Float.parseFloat(name);
+                    Float.parseFloat(arg);
                     break;
                 case "java.lang.Double":
-                    Double.parseDouble(name);
+                    Double.parseDouble(arg);
                     break;
                 default:
                     ValidateException.throwException("Non expectation Class Type");

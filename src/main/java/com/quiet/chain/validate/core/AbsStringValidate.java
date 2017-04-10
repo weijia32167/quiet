@@ -9,10 +9,10 @@ package com.quiet.chain.validate.core;
  */
 public abstract class AbsStringValidate implements IValidate {
 
-    protected String name;
+    protected String arg;
 
-    public AbsStringValidate(String name) {
-        this.name = name;
+    public AbsStringValidate(String arg) {
+        this.arg = arg;
     }
 
 

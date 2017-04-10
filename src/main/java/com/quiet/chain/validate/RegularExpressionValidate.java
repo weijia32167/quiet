@@ -18,15 +18,15 @@ public abstract class RegularExpressionValidate extends NotNullValidate {
 
     private final String ERROR;
 
-    public RegularExpressionValidate(String name, String regularExpression) {
-        super(name);
+    public RegularExpressionValidate(String arg, String name, String regularExpression) {
+        super(arg, name);
         this.regularExpression = regularExpression;
         this.pattern = Pattern.compile(regularExpression);
         ERROR = name + " " + Constant.ERROR_REGULAR_EXPRESSION + " " + regularExpression;
     }
 
-    public RegularExpressionValidate(String name, String regularExpression, String errorMessage) {
-        super(name);
+    public RegularExpressionValidate(String arg, String name, String regularExpression, String errorMessage) {
+        super(arg, name);
         this.regularExpression = regularExpression;
         this.pattern = Pattern.compile(regularExpression);
         ERROR = errorMessage;
@@ -35,7 +35,7 @@ public abstract class RegularExpressionValidate extends NotNullValidate {
     @Override
     public void validate() throws ValidateException {
         super.validate();
-        if (!pattern.matcher(name).matches()) {
+        if (!pattern.matcher(arg).matches()) {
             ValidateException.throwException(ERROR);
         }
     }

@@ -15,15 +15,15 @@ public class StringNumberRangeValidate extends StringToNumberValidate {
     private Number max;
     private final String ERROR;
 
-    public StringNumberRangeValidate(String value, Class clazz, Number min, Number max) {
-        super(value, clazz);
+    public StringNumberRangeValidate(String arg, String name, Class clazz, Number min, Number max) {
+        super(arg, name, clazz);
         this.min = min;
         this.max = max;
-        ERROR = value + " " + Constant.ERROR_NUMBER_RANGE + "[" + min + "," + max + "]";
+        ERROR = name + " " + Constant.ERROR_NUMBER_RANGE + "[" + min + "," + max + "]";
     }
 
-    public StringNumberRangeValidate(String name, Class clazz, Number min, Number max, String errorMessageIfNotRange) {
-        super(name, clazz);
+    public StringNumberRangeValidate(String arg, String name, Class clazz, Number min, Number max, String errorMessageIfNotRange) {
+        super(arg, name, clazz);
         this.min = min;
         this.max = max;
         this.ERROR = errorMessageIfNotRange;
@@ -43,22 +43,22 @@ public class StringNumberRangeValidate extends StringToNumberValidate {
         Number value = null;
         switch (className) {
             case "java.lang.Byte":
-                value = Byte.parseByte(name);
+                value = Byte.parseByte(arg);
                 break;
             case "java.lang.Integer":
-                value = Integer.parseInt(name);
+                value = Integer.parseInt(arg);
                 break;
             case "java.lang.Short":
-                Short.parseShort(name);
+                Short.parseShort(arg);
                 break;
             case "java.lang.Long":
-                value = Long.parseLong(name);
+                value = Long.parseLong(arg);
                 break;
             case "java.lang.Float":
-                value = Float.parseFloat(name);
+                value = Float.parseFloat(arg);
                 break;
             case "java.lang.Double":
-                value = Double.parseDouble(name);
+                value = Double.parseDouble(arg);
                 break;
         }
         return value;
