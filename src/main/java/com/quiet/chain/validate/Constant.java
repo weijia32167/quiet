@@ -9,6 +9,8 @@ package com.quiet.chain.validate;
 public final class Constant {
     public static final String ERROR_NULL = "can't be null!";
     public static final String ERROR_IPV4 = "Failure to comply with IPv4 rules!";
+    public static final String ERROR_NOT_NUMBER = "not a number!";
+
     public static final String ERROR_NUMBER_RANGE = "not in";
     public static final String ERROR_REGULAR_EXPRESSION = "mismatch";
 

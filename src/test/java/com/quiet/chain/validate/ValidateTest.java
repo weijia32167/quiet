@@ -11,24 +11,52 @@ import org.junit.Test;
  */
 public class ValidateTest {
 
+
     @Test
     public void stringToNumberValidate() throws ValidateException {
-        String a = "21";
-        StringNumberRangeValidate validate = new StringNumberRangeValidate(a, "a", Float.class, 10, 20);
+        try {
+            String error = "abc";
+            String nullObject = null;
+            String object = "1234f";
+            StringToNumberValidate validate = new StringToNumberValidate(object, "object", Float.class);
+            validate.validate();
+        } catch (ValidateException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Test
+    public void stringNumberRangeValidate() throws ValidateException {
+        String error1 = "21";
+        String error2 = "dsadsa";
+        String nullObject = null;
+        String object = "12f";
+        StringNumberRangeValidate validate = new StringNumberRangeValidate(error1, "object", Float.class, 10, 20);
+        validate.validate();
+    }
+
+    @Test
+    public void numberRangeValidate() throws ValidateException {
+        Number nullObject = null;
+        Number object = 11d;
+        Number error = 21d;
+        NumberRangeValidate validate = new NumberRangeValidate("object", error, 10, 20);
         validate.validate();
     }
 
     @Test
     public void nullValidate() throws ValidateException {
-        String a = null;
-        NotNullValidate validate = new NotNullValidate(a, "a");
+        String error = null;
+        String object = "";
+        NotNullValidate validate = new NotNullValidate(object, "object");
         validate.validate();
     }
 
     @Test
     public void ipv4Validate() throws ValidateException {
-        String ipV4 = "123";
-        IPv4Validate validate = new IPv4Validate(ipV4);
+        String error = "123";
+        String obejct = "123.123.123.10";
+        IPv4Validate validate = new IPv4Validate(obejct);
         validate.validate();
     }
 

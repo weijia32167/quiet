@@ -30,4 +30,12 @@ public class ValidateException extends Exception {
         throw new ValidateException(errorMessage);
     }
 
+    public static final void throwException(Throwable e) throws ValidateException {
+        throw new ValidateException(e);
+    }
+
+    public static final void throwException(String errorMessage, Throwable e) throws ValidateException {
+        throw new ValidateException(errorMessage, e);
+    }
+
 }

@@ -19,6 +19,7 @@ public class StringToNumberValidate extends NotNullValidate {
 
     @Override
     public void validate() throws ValidateException {
+        super.validate();
         String className = clazz.getName();
         try {
             switch (className) {
@@ -45,8 +46,7 @@ public class StringToNumberValidate extends NotNullValidate {
                     break;
             }
         } catch (NumberFormatException e) {
-            e.printStackTrace();
-            ValidateException.throwException(e.getMessage());
+            ValidateException.throwException(name + "[" + arg + "]" + " " + Constant.ERROR_NOT_NUMBER);
         } catch (ValidateException e) {
             throw e;
         }

@@ -11,8 +11,11 @@ public abstract class AbsStringValidate implements IValidate {
 
     protected String arg;
 
-    public AbsStringValidate(String arg) {
+    protected String name;
+
+    public AbsStringValidate(String arg, String name) {
         this.arg = arg;
+        this.name = name;
     }
 
 

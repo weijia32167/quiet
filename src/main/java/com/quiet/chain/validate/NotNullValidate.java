@@ -14,12 +14,12 @@ public class NotNullValidate extends AbsStringValidate {
     private final String ERROR;
 
     public NotNullValidate(String arg, String name) {
-        super(arg);
+        super(arg, name);
         ERROR = name + " " + Constant.ERROR_NULL;
     }
 
     public NotNullValidate(String arg, String name, String errorMessageIfNull) {
-        super(arg);
+        super(arg, name);
         ERROR = errorMessageIfNull;
     }
 
