@@ -1,7 +1,9 @@
 package com.quiet.chain.validate;
 
 import com.quiet.chain.validate.core.ValidateException;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 /**
  * Copyright tv.sohu.com
@@ -11,18 +13,17 @@ import org.junit.Test;
  */
 public class ValidateTest {
 
+    @Rule
+    public ExpectedException expectedEx = ExpectedException.none();
 
     @Test
     public void stringToNumberValidate() throws ValidateException {
-        try {
-            String error = "abc";
-            String nullObject = null;
-            String object = "1234f";
-            StringToNumberValidate validate = new StringToNumberValidate(object, "object", Float.class);
-            validate.validate();
-        } catch (ValidateException e) {
-            e.printStackTrace();
-        }
+        String error = "abc";
+        String nullObject = null;
+        String object = "1234f";
+        StringToNumberValidate validate = new StringToNumberValidate(nullObject, "object", Float.class);
+        validate.validate();
+        expectedEx.expect(ValidateException.class);
     }
 
     @Test
