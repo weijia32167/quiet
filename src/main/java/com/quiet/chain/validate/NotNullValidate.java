@@ -18,10 +18,10 @@ public class NotNullValidate extends AbsStringValidate {
         ERROR = name + " " + Constant.ERROR_NULL;
     }
 
-    public NotNullValidate(String arg, String name, String errorMessageIfNull) {
+  /*  public NotNullValidate(String arg, String name, String errorMessageIfNull) {
         super(arg, name);
         ERROR = errorMessageIfNull;
-    }
+    }*/
 
     @Override
     public void validate() throws ValidateException {
